@@ -6,20 +6,95 @@
 	objectVersion = 110;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		AD5861013091E8750037858D /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = AD5861033091E8750037858D /* GoogleMobileAds */; };
+		FF58610D3091E8750037858D /* KawaiiWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FF5861013091E8750037858D /* KawaiiWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		AE5861033091E8750037858D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF58607A3091E8750037858D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FF5860813091E8750037858D;
+			remoteInfo = kawaii_taiju_kanri;
+		};
+		FF58610E3091E8750037858D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = FF58607A3091E8750037858D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = FF5861053091E8750037858D;
+			remoteInfo = KawaiiWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		FF58610C3091E8750037858D /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = "";
+			dstSubfolder = PlugIns;
+			files = (
+				FF58610D3091E8750037858D /* KawaiiWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		AE5861013091E8750037858D /* kawaii_taiju_kanriUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = kawaii_taiju_kanriUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF5860823091E8750037858D /* kawaii_taiju_kanri.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = kawaii_taiju_kanri.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF5861013091E8750037858D /* KawaiiWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = KawaiiWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		FF5861043091E8750037858D /* Exceptions for "KawaiiWidget" folder in "KawaiiWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = FF5861053091E8750037858D /* KawaiiWidgetExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		AE5861023091E8750037858D /* kawaii_taiju_kanriUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = kawaii_taiju_kanriUITests;
+			sourceTree = "<group>";
+		};
 		FF5860843091E8750037858D /* kawaii_taiju_kanri */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = kawaii_taiju_kanri;
 			sourceTree = "<group>";
 		};
+		FF5861023091E8750037858D /* KawaiiWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				FF5861043091E8750037858D /* Exceptions for "KawaiiWidget" folder in "KawaiiWidgetExtension" target */,
+			);
+			path = KawaiiWidget;
+			sourceTree = "<group>";
+		};
+		FF5861033091E8750037858D /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Shared;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		AE5861053091E8750037858D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
 		FF58607F3091E8750037858D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				AD5861013091E8750037858D /* GoogleMobileAds in Frameworks */,
+			);
+		};
+		FF5861073091E8750037858D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
 			);
@@ -30,7 +105,10 @@
 		FF5860793091E8750037858D = {
 			isa = PBXGroup;
 			children = (
+				AE5861023091E8750037858D /* kawaii_taiju_kanriUITests */,
 				FF5860843091E8750037858D /* kawaii_taiju_kanri */,
+				FF5861033091E8750037858D /* Shared */,
+				FF5861023091E8750037858D /* KawaiiWidget */,
 				FF5860833091E8750037858D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -38,7 +116,9 @@
 		FF5860833091E8750037858D /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				AE5861013091E8750037858D /* kawaii_taiju_kanriUITests.xctest */,
 				FF5860823091E8750037858D /* kawaii_taiju_kanri.app */,
+				FF5861013091E8750037858D /* KawaiiWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -46,6 +126,27 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		AE5861073091E8750037858D /* kawaii_taiju_kanriUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AE58610A3091E8750037858D /* Build configuration list for PBXNativeTarget "kawaii_taiju_kanriUITests" */;
+			buildPhases = (
+				AE5861043091E8750037858D /* Sources */,
+				AE5861053091E8750037858D /* Frameworks */,
+				AE5861063091E8750037858D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AE58610B3091E8750037858D /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				AE5861023091E8750037858D /* kawaii_taiju_kanriUITests */,
+			);
+			name = kawaii_taiju_kanriUITests;
+			productName = kawaii_taiju_kanriUITests;
+			productReference = AE5861013091E8750037858D /* kawaii_taiju_kanriUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		FF5860813091E8750037858D /* kawaii_taiju_kanri */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = FF58608D3091E8770037858D /* Build configuration list for PBXNativeTarget "kawaii_taiju_kanri" */;
@@ -53,16 +154,43 @@
 				FF58607E3091E8750037858D /* Sources */,
 				FF58607F3091E8750037858D /* Frameworks */,
 				FF5860803091E8750037858D /* Resources */,
+				FF58610C3091E8750037858D /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				FF58610F3091E8750037858D /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				FF5860843091E8750037858D /* kawaii_taiju_kanri */,
+				FF5861033091E8750037858D /* Shared */,
+			);
+			name = kawaii_taiju_kanri;
+			packageProductDependencies = (
+				AD5861033091E8750037858D /* GoogleMobileAds */,
+			);
+			productName = kawaii_taiju_kanri;
+			productReference = FF5860823091E8750037858D /* kawaii_taiju_kanri.app */;
+			productType = "com.apple.product-type.application";
+		};
+		FF5861053091E8750037858D /* KawaiiWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = FF5861093091E8750037858D /* Build configuration list for PBXNativeTarget "KawaiiWidgetExtension" */;
+			buildPhases = (
+				FF5861063091E8750037858D /* Sources */,
+				FF5861073091E8750037858D /* Frameworks */,
+				FF5861083091E8750037858D /* Resources */,
 			);
 			buildRules = (
 			);
 			fileSystemSynchronizedGroups = (
-				FF5860843091E8750037858D /* kawaii_taiju_kanri */,
+				FF5861023091E8750037858D /* KawaiiWidget */,
+				FF5861033091E8750037858D /* Shared */,
 			);
-			name = kawaii_taiju_kanri;
-			productName = kawaii_taiju_kanri;
-			productReference = FF5860823091E8750037858D /* kawaii_taiju_kanri.app */;
-			productType = "com.apple.product-type.application";
+			name = KawaiiWidgetExtension;
+			productName = KawaiiWidgetExtension;
+			productReference = FF5861013091E8750037858D /* KawaiiWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -74,7 +202,14 @@
 				LastSwiftUpdateCheck = 2710;
 				LastUpgradeCheck = 2710;
 				TargetAttributes = {
+					AE5861073091E8750037858D = {
+						CreatedOnToolsVersion = 27.1;
+						TestTargetID = FF5860813091E8750037858D;
+					};
 					FF5860813091E8750037858D = {
+						CreatedOnToolsVersion = 27.1;
+					};
+					FF5861053091E8750037858D = {
 						CreatedOnToolsVersion = 27.1;
 					};
 				};
@@ -85,21 +220,37 @@
 			knownRegions = (
 				en,
 				Base,
+				ja,
 			);
 			mainGroup = FF5860793091E8750037858D;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				AD5861023091E8750037858D /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = FF5860833091E8750037858D /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				AE5861073091E8750037858D /* kawaii_taiju_kanriUITests */,
 				FF5860813091E8750037858D /* kawaii_taiju_kanri */,
+				FF5861053091E8750037858D /* KawaiiWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		AE5861063091E8750037858D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
 		FF5860803091E8750037858D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		FF5861083091E8750037858D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
 			);
@@ -107,14 +258,71 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		AE5861043091E8750037858D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
 		FF58607E3091E8750037858D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		FF5861063091E8750037858D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
 			);
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		AE58610B3091E8750037858D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FF5860813091E8750037858D /* kawaii_taiju_kanri */;
+			targetProxy = AE5861033091E8750037858D /* PBXContainerItemProxy */;
+		};
+		FF58610F3091E8750037858D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = FF5861053091E8750037858D /* KawaiiWidgetExtension */;
+			targetProxy = FF58610E3091E8750037858D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		AE5861083091E8750037858D /* Debug configuration for PBXNativeTarget "kawaii_taiju_kanriUITests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TGF4E76D8F;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "jp.jntech.kawaii-taiju-kanriUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = kawaii_taiju_kanri;
+			};
+			name = Debug;
+		};
+		AE5861093091E8750037858D /* Release configuration for PBXNativeTarget "kawaii_taiju_kanriUITests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TGF4E76D8F;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "jp.jntech.kawaii-taiju-kanriUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = kawaii_taiju_kanri;
+			};
+			name = Release;
+		};
 		FF58608B3091E8770037858D /* Debug configuration for PBXProject "kawaii_taiju_kanri" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -168,7 +376,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -226,7 +434,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -241,16 +449,21 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = kawaii_taiju_kanri/kawaii_taiju_kanri.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = TGF4E76D8F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "体重きろく";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "あなたに合った広告を表示するために使います。体重の記録は使いません。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -264,7 +477,7 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -273,16 +486,21 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = kawaii_taiju_kanri/kawaii_taiju_kanri.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = TGF4E76D8F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "体重きろく";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "あなたに合った広告を表示するために使います。体重の記録は使いません。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -296,13 +514,79 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		FF58610A3091E8750037858D /* Debug configuration for PBXNativeTarget "KawaiiWidgetExtension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = KawaiiWidget/KawaiiWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TGF4E76D8F;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = KawaiiWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "体重きろく";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "jp.jntech.kawaii-taiju-kanri.widget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		FF58610B3091E8750037858D /* Release configuration for PBXNativeTarget "KawaiiWidgetExtension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = KawaiiWidget/KawaiiWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TGF4E76D8F;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = KawaiiWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "体重きろく";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "jp.jntech.kawaii-taiju-kanri.widget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		AE58610A3091E8750037858D /* Build configuration list for PBXNativeTarget "kawaii_taiju_kanriUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AE5861083091E8750037858D /* Debug configuration for PBXNativeTarget "kawaii_taiju_kanriUITests" */,
+				AE5861093091E8750037858D /* Release configuration for PBXNativeTarget "kawaii_taiju_kanriUITests" */,
+			);
+			defaultConfigurationName = Release;
+		};
 		FF58607D3091E8750037858D /* Build configuration list for PBXProject "kawaii_taiju_kanri" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -319,7 +603,34 @@
 			);
 			defaultConfigurationName = Release;
 		};
+		FF5861093091E8750037858D /* Build configuration list for PBXNativeTarget "KawaiiWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF58610A3091E8750037858D /* Debug configuration for PBXNativeTarget "KawaiiWidgetExtension" */,
+				FF58610B3091E8750037858D /* Release configuration for PBXNativeTarget "KawaiiWidgetExtension" */,
+			);
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AD5861023091E8750037858D /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AD5861033091E8750037858D /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AD5861023091E8750037858D /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = FF58607A3091E8750037858D /* Project object */;
 	validationLevel = 1;

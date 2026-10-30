@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>かわいい体重管理</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Baloo+2:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="stage">
+  <div class="phone" id="phone">
+    <div class="island" aria-hidden="true"></div>
+    <div class="status" id="statusBar" aria-hidden="true"><span>9:41</span><span class="icons">
+      <svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="currentColor"/><rect x="5" y="5.5" width="3" height="6.5" rx="1" fill="currentColor"/><rect x="10" y="3" width="3" height="9" rx="1" fill="currentColor"/><rect x="15" y="0" width="3" height="12" rx="1" fill="currentColor"/></svg>
+      <span class="bat"><i></i></span></span></div>
+    <div class="toast" id="toast" role="status"></div>
+
+    <div class="scroll" id="scroll">
+
+      <!-- ===== ホーム ===== -->
+      <div class="screen" id="sc-home" role="tabpanel">
+        <div class="top">
+          <div><div class="date" id="today"></div><h1>きろく</h1></div>
+          <div class="pill" title="連続記録日数">🔥<b id="streak">0</b>日</div>
+        </div>
+        <div class="demoBar" id="absentBar" hidden><span>デモ：3日ぶりにアプリを開いた状態を再現しています</span><button id="absentOff">もどす</button></div>
+        <section class="hero" id="hero" aria-label="キャラクター">
+          <div class="charWrap"><div class="char" id="char" role="button" tabindex="0" aria-label="キャラクターをタップ"></div></div>
+          <div class="heroSide">
+            <div class="bubble fix" id="bubble" aria-live="polite"></div>
+            <div class="doneInfo" id="doneInfo" hidden>
+              <div class="big"><span id="dW">—</span><small>kg</small></div>
+              <div class="delta" id="dDelta"></div>
+              <button class="editLink" id="dEdit">記録を修正</button>
+            </div>
+          </div>
+          <div class="facePick" id="facePick" hidden>
+            <p>きょうのきぶん<small>よこにスクロールしてえらべるよ</small></p>
+            <div class="fpRow" id="fpRow" role="group" aria-label="きょうのきぶん"></div>
+          </div>
+          <div class="heroStats" id="heroStats">
+            <div class="hs"><span id="sDiffL">7日平均から</span><b id="sDiff">—</b></div>
+            <div class="hs"><span>もくひょう</span><b id="sGoal">—</b></div>
+            <div class="hs"><span>あと</span><b id="sLeft">—</b></div>
+          </div>
+        </section>
+        <section class="card" id="recCard" aria-label="きょうの体重">
+          <h2>きょうの体重 <small id="recState">まだ記録してないよ</small></h2>
+          <div class="stepper">
+            <button class="stepBtn" id="minus" aria-label="0.1kg 減らす">−</button>
+            <div class="weightVal"><input id="wInput" inputmode="decimal" aria-label="体重 (kg)"><span>kg</span></div>
+            <button class="stepBtn" id="plus" aria-label="0.1kg 増やす">+</button>
+          </div>
+          <div class="subRow"><span>きょうのこと</span><button class="linkBtn" id="openToday">体脂肪・メモ ›</button></div>
+          <div class="chips" id="homeTags"></div>
+          <button class="save" id="save">きろくする</button>
+        </section>
+        <section class="card goalCard" aria-label="もくひょうまで">
+          <h2>もくひょうまで <span><b id="gPct">0</b><small> %</small></span></h2>
+          <div class="track" id="track">
+            <div class="fill" id="gFill" style="width:0"></div>
+            <span class="tick" style="left:25%"></span><span class="tick" style="left:50%"></span><span class="tick" style="left:75%"></span>
+            <svg class="flagG" viewBox="0 0 26 42" aria-hidden="true"><rect x="3" y="2" width="2.5" height="40" rx="1.2" fill="#4A3020"/><path d="M5.5 3h17l-4 6 4 6h-17z" fill="#E58C86"/><circle cx="4.2" cy="2.5" r="2.5" fill="#F3CA89"/></svg>
+            <span class="runner" id="gRunner"></span>
+          </div>
+          <div class="trackLbl"><span>スタート <b id="gStart"></b></span><span>ゴール <b id="gGoal"></b></span></div>
+          <button class="cheer" id="cheer" aria-label="おうえんメッセージ（タップで次のメッセージ）">
+            <span class="cheerFace" id="cheerFace"></span>
+            <span class="cheerTxt"><b id="cheerMsg"></b><small id="cheerSub"></small></span>
+          </button>
+        </section>
+        <section class="card" aria-label="グラフ">
+          <h2>さいきん2週間 <small>くわしくはグラフタブへ</small></h2>
+          <svg class="chart" id="chartHome" viewBox="0 0 320 170" role="img" aria-label="直近2週間の体重グラフ"></svg>
+        </section>
+        <section class="card" aria-label="履歴">
+          <h2>りれき <button class="linkBtn" id="addPast">＋ 過去の日を入力</button></h2>
+          <ul class="hist" id="hist"></ul>
+          <div class="hint">タップすると、その日のようすが見られるよ</div>
+        </section>
+      </div>
+
+      <!-- ===== グラフ ===== -->
+      <div class="screen" id="sc-graph" role="tabpanel" hidden>
+        <div class="top"><div><div class="date">からだのうつりかわり</div><h1>グラフ</h1></div></div>
+        <section class="card" style="margin-top:0">
+          <h2>体重
+            <span class="seg" role="group" aria-label="期間" id="rangeSeg">
+              <button aria-pressed="false" data-range="7">1週</button>
+              <button aria-pressed="true" data-range="30">1か月</button>
+              <button aria-pressed="false" data-range="90">3か月</button>
+            </span>
+          </h2>
+          <svg class="chart" id="chartBig" viewBox="0 0 320 200" role="img" aria-label="体重の推移グラフ"></svg>
+          <div class="legend"><span><i></i>体重</span><span><i class="avg"></i>7日平均</span><span><i class="goal"></i>もくひょう</span></div>
+        </section>
+        <div class="stats" id="stats"></div>
+        <section class="card">
+          <h2>BMI <small id="bmiH">身長 160cm で計算</small></h2>
+          <div class="bmiRow"><div class="bmiNum" id="bmiNum">—</div><div class="bmiFace" id="bmiFace"></div></div>
+          <div class="gauge"><i style="width:18.5%"></i><i style="width:32.5%"></i><i style="width:25%"></i><i style="width:24%"></i><span class="mk" id="bmiMk"></span></div>
+          <div class="gaugeLbl"><span style="left:18.5%">18.5</span><span style="left:51%">25</span><span style="left:76%">30</span></div>
+          <div class="fatLine"><span>体脂肪率（さいしん）</span><span id="fatNow">—</span></div>
+        </section>
+        <section class="card">
+          <h2>カレンダー
+            <span class="calHead"><button id="calPrev" aria-label="前の月">‹</button><span id="calTitle" style="min-width:64px;text-align:center"></span><button id="calNext" aria-label="次の月">›</button></span>
+          </h2>
+          <div class="cal" id="cal"></div>
+          <div class="hint">日付をタップすると、その日のようすが見られるよ（記録がない日は入力できるよ）。赤い点はタグ付きの日</div>
+        </section>
+      </div>
+
+      <!-- ===== キャラ ===== -->
+      <div class="screen" id="sc-chara" role="tabpanel" hidden>
+        <div class="top">
+          <div><div class="date">いっしょにがんばる相棒</div><h1>キャラ</h1></div>
+          <div class="pill">きろく<b id="totalRec">0</b>回</div>
+        </div>
+        <section class="room" aria-label="キャラのおへや">
+          <div class="bubble fix" id="bubble2" aria-live="polite"></div>
+          <div class="charWrap"><div class="char" id="char2" role="button" tabindex="0" aria-label="キャラクターをタップ"></div></div>
+          <div class="nameRow"><input id="charName" maxlength="10" placeholder="なまえをつけてね" aria-label="キャラの名前"></div>
+        </section>
+        <section class="card">
+          <h2>なかよし度 <small id="lvNext"></small></h2>
+          <div class="lv"><b id="lvNum">Lv.1</b><span id="lvTitle" style="font-weight:700"></span></div>
+          <div class="bar"><i id="lvBar" style="width:0"></i></div>
+          <div class="hint">毎日きろくすると、なかよし度が上がるよ</div>
+        </section>
+        <section class="card">
+          <h2>ごほうび <small id="badgeCount"></small></h2>
+          <div class="badges" id="badges"></div>
+          <div class="hint">もらったメダルをタップすると、お祝いをもう一度見られるよ</div>
+        </section>
+        <section class="card">
+          <h2>ひょうじょうずかん <small id="dexCount"></small></h2>
+          <div class="dex" id="dex"></div>
+          <div class="hint">タップすると、おへやのキャラがその顔になるよ。数字はその顔になった日の回数</div>
+        </section>
+      </div>
+
+      <!-- ===== せってい ===== -->
+      <div class="screen" id="sc-settings" role="tabpanel" hidden>
+        <div class="top"><div><div class="date">じぶん好みに</div><h1>せってい</h1></div></div>
+        <div class="group" style="margin-top:4px">
+          <h3>からだ</h3>
+          <div class="list">
+            <div class="row"><span class="ri" style="background:#E6F4F5">📏</span><span class="lbl">身長</span>
+              <button class="mini" data-adj="height" data-d="-1" aria-label="身長を1cm減らす">−</button><span class="val" id="vHeight"></span><button class="mini" data-adj="height" data-d="1" aria-label="身長を1cm増やす">+</button></div>
+            <div class="row"><span class="ri" style="background:#E7F5F0">🎯</span><span class="lbl">もくひょう体重</span>
+              <button class="mini" data-adj="goal" data-d="-0.5" aria-label="目標を0.5kg減らす">−</button><span class="val" id="vGoal"></span><button class="mini" data-adj="goal" data-d="0.5" aria-label="目標を0.5kg増やす">+</button></div>
+          </div>
+        </div>
+        <div class="group">
+          <h3>キャラのはんてい</h3>
+          <div class="list">
+            <div class="row"><span class="ri" style="background:#FBEDE7">⚖️</span><span class="lbl">くらべかた</span>
+              <span class="seg" role="group" aria-label="くらべかた" id="judgeSeg"><button data-j="trend" aria-pressed="true">7日平均</button><button data-j="daily" aria-pressed="false">前日</button></span></div>
+            <div class="row"><span class="ri" style="background:#FBEDE7">🍰</span><label for="optStrict">きびしめモード</label><input type="checkbox" class="sw" id="optStrict" data-opt="strict"></div>
+          </div>
+          <div class="hint" style="margin:6px 14px 0">「7日平均」だと、日々の水分の上下で表情がころころ変わらないよ。きびしめモードでは 0.3kg 増えただけで「なきそう」になるよ</div>
+        </div>
+        <div class="group">
+          <h3>おしらせ</h3>
+          <div class="list">
+            <div class="row"><span class="ri" style="background:#FDF0DC">⏰</span><label for="optRemind">毎朝はかってね通知</label><input type="checkbox" class="sw" id="optRemind" data-opt="remind"></div>
+            <div class="row"><span class="ri" style="background:#FDF0DC">🕖</span><label for="optTime">通知の時間</label><input type="time" id="optTime"></div>
+            <button class="row" data-preview="notif"><span class="ri" style="background:#FDF0DC">🔔</span><span class="lbl">通知のみため<span class="preTag">プレビュー</span><small>キャラのセリフで届くよ</small></span><span class="chev">›</span></button>
+          </div>
+        </div>
+        <div class="group">
+          <h3>ウィジェット</h3>
+          <div class="list">
+            <button class="row" data-preview="widget"><span class="ri" style="background:#E6F4F5">🧩</span><span class="lbl">ホーム画面ウィジェット<span class="preTag">プレビュー</span><small>きょうの表情と体重が見られるよ</small></span><span class="chev">›</span></button>
+          </div>
+        </div>
+        <div class="group">
+          <h3>キャラ</h3>
+          <div class="list">
+            <div class="row"><span class="ri" style="background:#FBEDE7">💬</span><label for="optTalk">ふきだしでしゃべる</label><input type="checkbox" class="sw" id="optTalk" data-opt="talk"></div>
+            <div class="row"><span class="ri" style="background:#FBEDE7">✨</span><label for="optMove">ふわふわ動く</label><input type="checkbox" class="sw" id="optMove" data-opt="move"></div>
+            <button class="row" data-preview="absent"><span class="ri" style="background:#FBEDE7">🥺</span><span class="lbl">ひさしぶりに開いたとき<span class="preTag">プレビュー</span><small>3日あくと、さみしがるよ</small></span><span class="chev">›</span></button>
+            <button class="row" data-preview="reward"><span class="ri" style="background:#FFF3D9">🏅</span><span class="lbl">ごほうびのお祝い<span class="preTag">プレビュー</span><small>1kg減・目標達成・連続記録など</small></span><span class="chev">›</span></button>
+          </div>
+        </div>
+        <div class="group">
+          <h3>データ</h3>
+          <div class="list">
+            <div class="row"><span class="ri" style="background:#F3EEE9">📤</span><span class="lbl">CSVで書き出す</span><span class="chev">›</span></div>
+            <button class="row" data-preview="onb"><span class="ri" style="background:#E7F5F0">👋</span><span class="lbl">はじめの設定画面を見る<span class="preTag">プレビュー</span><small>インストール直後の流れ。いまの記録はそのまま</small></span><span class="chev">›</span></button>
+            <button class="row" data-preview="fresh"><span class="ri" style="background:#E7F5F0">🌱</span><span class="lbl">記録0件から体験する<span class="preTag">プレビュー</span><small>記録を消して、初期設定から始めるよ</small></span><span class="chev">›</span></button>
+            <button class="row danger" id="reset"><span class="ri" style="background:#FBE5E3">🔄</span><span class="lbl">サンプルデータに戻す</span></button>
+          </div>
+        </div>
+        <div class="group">
+          <h3>このアプリについて</h3>
+          <div class="list"><div class="row"><span class="lbl">バージョン</span><span style="font-family:var(--font-num);font-weight:700;color:var(--ink-soft)">0.4 デモ</span></div></div>
+        </div>
+        <div class="bye" id="bye"></div>
+      </div>
+    </div>
+
+
+    <!-- はじめての起動 -->
+    <section class="onb" id="onb" aria-label="はじめての設定" inert>
+      <div class="onbTop"><button class="back" id="onbBack">‹ もどる</button><div class="onbDots" id="onbDots"></div><span style="width:52px"></span></div>
+      <div class="onbStep" id="onbStep"></div>
+      <div class="onbBtns"><button class="save" id="onbNext">はじめる</button><button class="skip" id="onbSkip">いまはいい</button></div>
+    </section>
+
+    <!-- 日の詳細（日記ページ） -->
+    <section class="detail" id="detail" aria-label="日の詳細" inert>
+      <div class="dNav"><button id="dBack">‹ もどる</button><b id="dTitle"></b><button id="dEditBtn">編集</button></div>
+      <div class="dStage">
+        <div class="bubble b fix" id="dBubble"></div>
+        <div class="dChar" id="dChar"></div>
+        <div class="dBig"><span id="dWeight"></span><small>kg</small></div>
+        <div class="dSub" id="dSub"></div>
+      </div>
+      <div class="dMetrics" id="dMetrics"></div>
+      <section class="card">
+        <h2>前後1週間 <small>この日を●で表示</small></h2>
+        <svg class="chart" id="dChart" viewBox="0 0 320 150" role="img" aria-label="前後1週間の体重グラフ"></svg>
+      </section>
+      <section class="card dMemo"><h2>この日のこと</h2><div class="chips" id="dTags"></div><p id="dMemoTxt"></p></section>
+      <div class="dPN"><button id="dPrev"></button><button id="dNext"></button></div>
+    </section>
+
+    <nav class="tabbar" role="tablist" aria-label="タブ">
+      <button class="tab" role="tab" data-tab="home" aria-selected="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/></svg>ホーム</button>
+      <button class="tab" role="tab" data-tab="graph" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 19 9 12l4 3 7-9"/></svg>グラフ</button>
+      <button class="tab" role="tab" data-tab="chara" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="9" r="4"/><path d="M4.5 20c1.5-3.5 4.3-5 7.5-5s6 1.5 7.5 5"/></svg>キャラ</button>
+      <button class="tab" role="tab" data-tab="settings" aria-selected="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/></svg>せってい</button>
+    </nav>
+    <span class="home-ind" aria-hidden="true"></span>
+
+    <!-- 記録シート -->
+    <div class="back" id="sheetBack"></div>
+    <section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="記録の入力・修正" inert>
+      <div class="grab" aria-hidden="true"></div>
+      <div class="shHead">
+        <span style="width:32px"></span>
+        <div class="nav"><button id="shPrev" aria-label="前の日">‹</button><h3 id="shDate"></h3><button id="shNext" aria-label="次の日">›</button></div>
+        <button class="close" id="shClose" aria-label="とじる">×</button>
+      </div>
+      <div class="shCard">
+        <div class="shLbl">体重 <small id="shState" style="color:var(--ink-soft);font-size:12px"></small></div>
+        <div class="stepper">
+          <button class="stepBtn" id="shMinus" aria-label="0.1kg 減らす">−</button>
+          <div class="weightVal"><input id="shW" inputmode="decimal" aria-label="体重 (kg)"><span>kg</span></div>
+          <button class="stepBtn" id="shPlus" aria-label="0.1kg 増やす">+</button>
+        </div>
+      </div>
+      <div class="shCard">
+        <div class="shLbl">この日のきぶん <small id="shFaceNote" style="color:var(--ink-soft);font-size:11px"></small></div>
+        <div class="fpRow" id="shFaces" role="group" aria-label="この日のきぶん"></div>
+      </div>
+      <div class="shCard">
+        <div class="shLbl"><label for="shFatOn">体脂肪率もきろく</label><input type="checkbox" class="sw" id="shFatOn"></div>
+        <div class="fatRow" id="fatRow">
+          <button class="mini" id="shFatM" aria-label="0.1% 減らす">−</button>
+          <span class="fv"><span id="shFat">28.0</span><small style="font-size:14px">%</small></span>
+          <button class="mini" id="shFatP" aria-label="0.1% 増やす">+</button>
+        </div>
+      </div>
+      <div class="shCard">
+        <div class="shLbl">タグ</div>
+        <div class="chips" id="shTags"></div>
+        <div class="shLbl" style="margin-top:14px"><label for="shMemo">ひとことメモ</label></div>
+        <textarea id="shMemo" rows="2" maxlength="60" placeholder="例：友だちと焼肉"></textarea>
+      </div>
+      <button class="save" id="shSave">保存する</button>
+      <button class="del" id="shDel">この日の記録を削除</button>
+    </section>
+
+    <!-- 通知プレビュー -->
+    <button class="notif" id="notif" aria-label="通知（タップでとじる）" tabindex="-1">
+      <span class="appIcon" id="notifIcon"></span>
+      <span class="nb"><span class="nt"><span>かわいい体重管理</span><span>いま</span></span><span class="nh" id="notifTitle"></span><br><span id="notifBody"></span></span>
+    </button>
+
+    <!-- ウィジェットプレビュー（ホーム画面） -->
+    <div class="springboard" id="springboard" aria-hidden="true" inert>
+      <div class="sbGrid" id="sbGrid"></div>
+      <div class="sbNote"><span>ウィジェットのみため（プレビュー）。実機ではiPhoneのホーム画面に置けます</span><button id="sbClose">アプリにもどる</button></div>
+    </div>
+
+    <!-- ごほうび -->
+    <div class="reward" id="reward" aria-hidden="true" inert>
+      <canvas id="confetti"></canvas>
+      <div class="rwCard" role="dialog" aria-label="ごほうび">
+        <div class="eyebrow">ごほうびゲット！</div>
+        <h3 id="rwTitle"></h3>
+        <div class="rwChar" id="rwChar"></div>
+        <p id="rwMsg"></p>
+        <div class="rwGift" id="rwGift"></div>
+        <button class="save" id="rwClose">ありがとう！</button>
+      </div>
+    </div>
+  </div>
+
+  <aside class="side">
+    <h3>デモで見られること</h3>
+    <p>アプリの中のボタンでも同じものが見られます（せってい › プレビュー）。</p>
+    <div class="demoBtns">
+      <button data-preview="notif"><b>🔔 通知</b>キャラのセリフで届く</button>
+      <button data-preview="widget"><b>🧩 ウィジェット</b>ホーム画面に置く</button>
+      <button data-preview="absent"><b>🥺 3日ぶり</b>さみしがる反応</button>
+      <button data-preview="reward"><b>🏅 ごほうび</b>1kg減のお祝い</button>
+      <button data-preview="onb"><b>👋 はじめの設定</b>オンボーディングだけ見る</button>
+      <button data-preview="fresh"><b>🌱 記録0件から</b>記録を消して体験（「せってい」で戻せます）</button>
+    </div>
+    <h4>もくひょう達成度でおうえんを試す</h4>
+    <div class="slider">
+      <label for="pctSlider" style="font-size:12px;font-weight:700;color:var(--ink-soft)">スライダーを動かすと、ホームのおうえんが変わります</label>
+      <input type="range" id="pctSlider" min="-5" max="110" step="1">
+      <div><span id="pctVal"></span><button id="pctReset">実データに戻す</button></div>
+    </div>
+    <h4>キャラの表情チェック</h4>
+    <div class="faces" id="faces"></div>
+    <div class="rules" id="rules"></div>
+  </aside>
+</div>
+<script src="js/app.js"></script>
+</body>
+</html>

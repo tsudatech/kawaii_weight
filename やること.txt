@@ -1,0 +1,115 @@
+- 画面モック
+    こちらのファイルを参考にまずは全ての画面についてモックを作成してみてくれませんか
+- モック解除
+    - いったんOK.ではロジックについてモック化されている箇所をすべてモック解除してください。全画面進めてみてください
+- スプラッシュ画面
+    こちらにスプラッシュ画面を追加したので、アプリに反映してくれませんか
+- BGMと効果音ですが、マナーモード時でもなるようにしてみて
+- ローカライズ
+    Users/tsudajun/Documents/project/pocorinを参考にローカライズを実施してください
+- ライトモードダークモード
+- 低めのiOS バージョンを許可
+- Users/tsudajunDocuments/project/tsunapon を参考に、アプリがバックグラウンドに移ったらBGMをミュートにするようにしてください
+- キーボードの外側押下でキーボード閉じる
+- 左or下スワイプ戻りできる必要のある画面についてはそうできるようにしてください
+- 縦向き矯正およびiPad対応オフを実施してくれませんか
+- 日本語版表示名英語版表示名の変更
+- アイコン作成
+    これをアイコンとして設定してくれませんか。上記は消去予定なのでコピーして使って
+- 記録画面にプレイ時間も追加してください。アプリが前面に出ている時間でカウントしましょう
+- 初回起動のオンボーディング
+    Users/tsudajun/Documents/project/pocorinを参考に初回起動時のオンボーディングを実装してください
+- iCloud同期
+    Users/tsudajun/Documents/project/pocorinを参考にデータのバックアップ機能を設定画面に追加してください
+- 本アプリのAppStoreページ用のヘッダ画像を、最新のAppStore仕様を確認しつつ作成してください
+- アプリ全体を通して矛盾がある箇所がないかチェックしてください
+- サンプルデータ (デバッグモード)
+    /Users/tsudajun/Documents/project/pocorin
+    こちらを参考に設定画面にデバッグモード用の設定を追加してくれませんか
+- Web
+    https://github.com/tsudatech/puzzle_chan_web
+    こちらを参考に本アプリの紹介用ページを作成してみてくれませんか。
+    スクリーショットセクションは不要です
+- AppStoreに掲載するための紹介画像セクション用のプレイ動画を撮影してくれませんか
+- 紹介画像作成 (claudeアプリで別途指示？)
+    こちらのAppStore掲載用の紹介画像を1枚作成してみてもらえませんか
+    - これを参考に英語版も作成してみてくれませんか (翻訳ファイルを渡して)
+- 今一度アプリに不具合がないかを確認してみてもらえませんか
+- ASO対策
+    こちらの資料を参考に、本アプリのASO対策をmdにまとめてみてください。またそれを参考にAppStore用の文言 (タイトル、サブタイトル、カテゴリ、プロモーションテキスト、概要、キーワード) を日本語英語併記で別途mdにまとめてください
+- 広告
+    - 下記が広告情報ですので/Users/tsudajun/Documents/project/kawaii_diaryを参考にbannerとinterstitialを実装してくれませんか。
+    スクロールビューとなっている箇所は、バナー広告の分だけスクロールパディングを開けたいです
+    また、広告の審査が通っていない間は広告は非表示になるように実装してほしいです
+    appid: ca-app-pub-9220331962131574~4431737933
+    banner: ca-app-pub-9220331962131574/1921124665
+    interstitial: ca-app-pub-9220331962131574/5805810611
+---    
+- 前もっての審査対応
+    下記のレビューが来ることがよくあるので、先にメッセージを考えておいてください (mdにまとめて)。
+    後、画面キャプチャのキャプチャ手順も考えてください
+
+    ---
+    Guideline 2.1 - Information Needed - New App Submission
+
+    We need additional information to better understand the app and complete the review.
+
+    Note: Before submitting, run the submitted build through your own testing and quality assurance process on supported physical devices. App Review is intended for apps and metadata that are complete and ready for App Store customers.
+
+    If the app is ready for review, follow the directions below.
+
+    Next Steps
+
+    Reply in App Store Connect with all of the following information and also add this information to the Notes field of the App Review Information section in App Store Connect, for reference on future submissions:
+
+    1. A screen recording captured on a physical device, running the latest operating system, demonstrating the app's functionality. The recording must begin with launching the app and show the typical user flow. If the app has any of the following, include them in the recording:
+
+    - Account registration, login, and account deletion flows. Account deletion is required in apps that support account creation.
+    - Any user-generated content, including the required content reporting and blocking mechanisms.
+    - Accessing paid content or features within the app.
+
+    2. A description of the app's purpose and target audience, including the problem it solves and the value it provides
+    3. Instructions for setting up and accessing the app's main features, including any required login credentials or sample files
+    4. A list of the external services, tools, or platforms the app uses to deliver its core functionality (for example, data providers, authentication services, payment processors, or AI services)
+    5. Describe any regional differences in the app’s features or content, or confirm that the app functions consistently across all regions
+    6. If the app operates in a highly regulated industry or includes protected third-party material, provide any relevant documentation or credentials to demonstrate you are authorized to provide these services or protected material
+
+
+    Prevent Common Issues
+
+    - Guideline 2.1 - Bugs and crashes: Apps are reviewed on physical devices to mirror real-world conditions. Test the app on each supported device platform before submitting. Use TestFlight to distribute builds for beta testing on real devices.
+    - Guideline 2.1 - Accessing the app: If the app includes account-based features, provide up-to-date login credentials for a demo account in App Store Connect. If the app has multiple account types, provide credentials for each type in the Notes field.
+    - Guideline 2.3.3 - Screenshots: App screenshots on the App Store must show the actual app in use, and not merely the title art, login page, or splash screen.
+    - Guideline 3.1.1 - In-App Purchase: In-App Purchase products should be configured and submitted alongside the app.
+    - Guideline 3.2 - Other Business Models: If your app is intended to be used by specific businesses, organizations or employees then use one of the other distribution options available to you through the Apple Developer Program Account.
+---
+- アプリ審査用の画面キャプチャ
+    ありがとうございます。続いては下記を参考にUIキャプチャ用のテストを作成してください
+    ---
+    このアプリの App Review 用の画面収録を撮るための UI テスト（XCUITest）を作ってください。
+    Guideline 2.1（Information Needed）で求められる「実機で、アプリの起動から主な機能までを通した動画」に使います。
+
+    ## やってほしいこと
+    1. アプリの画面と主な流れを調べて、審査員に見せる流れを提案する（初回の案内、許可のダイアログ、主な機能、各メニュー、設定）。流れを決めてから実装する
+    2. UI テストのターゲットがなければ追加する（starlinkUITests のような名前。TEST_TARGET_NAME はアプリ本体）
+    3. 流れを最初から最後まで自動で進めるテストを1本書く
+    4. シミュレータで動かし、`xcrun simctl io recordVideo` で録画したコマ送り画像を見て、流れが正しいか確かめて直す
+    5. 実機で動かす（私が画面収録を始めてから「実行して」と言うので、それまで待つ）
+
+    ## テストの決まり
+    - 起動は、iOS のホーム画面に戻ってアイコンをタップする（`XCUIDevice.shared.press(.home)` → springboard のアイコン）。1ページ目になければ横にめくって探す
+    - ボタンは表示されている文字で探す。日本語と英語の両方の文字で探して、端末の言語に関係なく動くようにする
+    - 初回の案内やトラッキング許可（ATT）などのダイアログも、テストの中で進める（ATT は springboard の alert）
+    - 見ている人が読めるよう、画面ごとに 1〜2 秒待つ
+    - **広告を絶対に押さない**：画面の下にバナーがある画面では、ボタンが広告の高さより下にあるときは上にスクロールしてから押す。出せないときは押さない
+    - 実行は `-configuration Release`（テスト広告の「Test mode」を映さない）・`-parallel-testing-enabled NO`（シミュレータの複製で動かさない）
+
+    ## 気をつけること
+    - 実機のアプリを削除するとき（初回の状態から撮るため）は、記録が消えるので必ず私に確認する
+    - テスト用のアプリ（〜UITests-Runner）が収録に映ることがある。ホーム画面で映らない場所に移すよう、私に伝える
+    - テストのためにアプリの中身（コード）は変えない。どうしても必要なときは理由を言って確認する
+
+    ## 最後に
+    - 審査への返信文（英語・4000 文字以内・動画は添付する前提で URL なし）も作る。
+    内容：1 画面収録（端末と iOS のバージョン）、2 目的と対象、3 主な機能の使い方、4 使っている外部サービス、5 地域による違い、6 規制業種・第三者の素材
+    - 実際の画面にない機能は書かない（非表示の機能など）
