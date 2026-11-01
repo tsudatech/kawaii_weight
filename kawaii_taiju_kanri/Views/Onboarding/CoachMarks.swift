@@ -12,6 +12,18 @@ import SwiftUI
 
 // MARK: - どの案内を見たか
 
+extension AppTab {
+    /// そのタブの案内の種類
+    var coachKind: Onboarding.Kind {
+        switch self {
+        case .home: .home
+        case .graph: .graph
+        case .chara: .chara
+        case .settings: .settings
+        }
+    }
+}
+
 enum Onboarding {
     enum Kind: String, CaseIterable {
         case home, graph, chara, settings

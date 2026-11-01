@@ -297,11 +297,13 @@ struct MemoField: View {
     @Binding var text: String
     /// 入力中かどうか（入力欄そのものに付ける。外側の View に .focused を付けても効かない）
     var focused: FocusState<Bool>.Binding
+    /// あらかじめあけておく行数（ホームは1行。打てば2行まで伸びる）
+    var reservedLines = 2
 
     var body: some View {
         TextField("", text: $text, prompt: Text(L("例：友だちと焼肉")).foregroundStyle(Palette.inkFaint), axis: .vertical)
             .focused(focused)
-            .lineLimit(2, reservesSpace: true)
+            .lineLimit(reservedLines...2)
             .font(.ui(14, .medium))
             .foregroundStyle(Palette.ink)
             .padding(.vertical, 12).padding(.horizontal, 14)
@@ -312,14 +314,35 @@ struct MemoField: View {
 }
 
 struct TagPicker: View {
+    @EnvironmentObject private var store: WeightStore
     @Binding var selected: [String]
+    /// 1行にして横にスクロールする（ホームで「きろくする」まで見えるように）。
+    /// カードの左右の余白（bleed）まではみ出して、端で切れて見えるようにする
+    var singleLine = false
+    var bleed: CGFloat = 16
 
     var body: some View {
-        FlowLayout(spacing: 6) {
-            ForEach(DayTag.all, id: \.self) { t in
-                TagChip(title: L(t), on: selected.contains(t)) {
-                    if let i = selected.firstIndex(of: t) { selected.remove(at: i) } else { selected.append(t) }
-                }
+        if singleLine {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 6) { chips }
+                    .padding(.vertical, 2)
+            }
+            .contentMargins(.horizontal, bleed, for: .scrollContent)
+            .padding(.horizontal, -bleed)
+        } else {
+            FlowLayout(spacing: 6) { chips }
+        }
+    }
+
+    /// せっていのタグ。一覧から消したタグも、この日に付いていれば出す（外せるように）
+    private var tags: [String] {
+        store.settings.tags + selected.filter { !store.settings.tags.contains($0) }
+    }
+
+    private var chips: some View {
+        ForEach(tags, id: \.self) { t in
+            TagChip(title: L(t), on: selected.contains(t)) {
+                if let i = selected.firstIndex(of: t) { selected.remove(at: i) } else { selected.append(t) }
             }
         }
     }
@@ -378,7 +401,12 @@ struct WeightStepper: View {
             RoundStepButton(symbol: "−") { bump(-step) }
                 .accessibilityLabel(LF("%1$@%2$@ 減らす", Fmt.kg(step), unit))
             HStack(alignment: .firstTextBaseline, spacing: 0) {
-                TextField("", text: $text)
+                // 打った瞬間に値にも入れる。数字のキーボードには「完了」がないので、打ってすぐ保存ボタンを押すと、
+                // 入力欄からはなれる前に保存されて前の値のままになるため（onChange だと1文字おくれる）
+                TextField("", text: Binding(get: { text }, set: { t in
+                    text = t
+                    if let v = Self.parse(t) { value = clamp(v) }
+                }))
                     .keyboardType(.decimalPad)
                     .focused($focused)
                     .multilineTextAlignment(.center)
@@ -406,9 +434,13 @@ struct WeightStepper: View {
 
     /// 入力欄からはなれたら数字に直す（読めなければ 58）
     private func commit() {
-        let v = Double(text.replacingOccurrences(of: ",", with: ".")) ?? 58
+        let v = Self.parse(text) ?? 58
         value = clamp(v)
         text = Fmt.kg(value)
+    }
+
+    private static func parse(_ t: String) -> Double? {
+        Double(t.replacingOccurrences(of: ",", with: "."))
     }
 
     private func clamp(_ v: Double) -> Double {

@@ -41,6 +41,11 @@ struct RootView: View {
                     .transition(.move(edge: .trailing))
                     .zIndex(3)
             }
+            if store.showTags {
+                TagsView()
+                    .transition(.move(edge: .trailing))
+                    .zIndex(3)
+            }
 
             TabBar()
                 .zIndex(4)
@@ -104,6 +109,7 @@ struct RootView: View {
         .animation(.cssEase(0.25), value: store.selectedTab)
         .animation(.slide, value: store.detailDate)
         .animation(.slide, value: store.showBackup)
+        .animation(.slide, value: store.showTags)
         .animation(.slide, value: store.editing)
         .animation(.cssEase(0.3), value: store.showOnboarding)
         .animation(.cssEase(0.3), value: store.showWidgetPreview)
@@ -125,7 +131,7 @@ struct RootView: View {
         .task(id: coachTrigger) {
             try? await Task.sleep(for: .milliseconds(500))
             guard !Task.isCancelled, canShowCoach else { return }
-            let kind = coachKind(store.selectedTab)
+            let kind = store.selectedTab.coachKind
             guard Onboarding.needs(kind) else { return }
             store.coach = CoachTour(kind: kind, pages: Self.coachPages[kind] ?? [])
         }
@@ -145,16 +151,7 @@ struct RootView: View {
     /// ほかの画面やお祝いが出ていないときだけ
     private var canShowCoach: Bool {
         store.onboarded && !store.showOnboarding && store.editing == nil && store.detailDate == nil
-            && store.celebrating == nil && !store.showWidgetPreview && !store.showBackup && store.coach == nil
-    }
-
-    private func coachKind(_ tab: AppTab) -> Onboarding.Kind {
-        switch tab {
-        case .home: .home
-        case .graph: .graph
-        case .chara: .chara
-        case .settings: .settings
-        }
+            && store.celebrating == nil && !store.showWidgetPreview && !store.showBackup && !store.showTags && store.coach == nil
     }
 
     /// 各タブの案内。画面に見えていない部品のページは飛ばす
@@ -226,11 +223,17 @@ struct TabBar: View {
     private func item(_ tab: AppTab, _ label: String, _ icon: TabIcon) -> some View {
         let on = store.selectedTab == tab
         return Button {
+            let switched = store.selectedTab != tab
             store.detailDate = nil
             store.showBackup = false
+            store.showTags = false
             store.selectedTab = tab
-            // 何回か記録したあとの、つぎのタブ切りかえで全画面広告（お祝いなどと重なるときは見送る）
-            AdService.shared.showInterstitialIfDue(isBusy: store.celebrating != nil || store.editing != nil || store.coach != nil)
+            // 何回か記録したあとの、つぎのタブ切りかえで全画面広告。いま開いているタブを押しなおしたときは出さない。
+            // お祝い（出る直前も）・シート・案内と重なるとき、切りかえた先でこれから案内が出るときは見送る
+            guard switched else { return }
+            let busy = store.celebrating != nil || store.celebrationPending || store.editing != nil
+                || store.coach != nil || Onboarding.needs(tab.coachKind)
+            AdService.shared.showInterstitialIfDue(isBusy: busy)
         } label: {
             VStack(spacing: 2) {
                 icon.stroke(style: StrokeStyle(lineWidth: 2.2, lineCap: .round, lineJoin: .round))

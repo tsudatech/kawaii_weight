@@ -248,11 +248,11 @@ struct RecordCard: View {
             .onGeometryChange(for: CGFloat.self) { $0.frame(in: .named(ScreenScroll<EmptyView>.contentSpace)).minY } action: { onMemoRowY($0) }
             .padding(.top, 14)
             .padding(.bottom, 8)
-            TagPicker(selected: $tags)
+            TagPicker(selected: $tags, singleLine: true)
             Text(L("ひとことメモ")).font(.ui(12)).foregroundStyle(Palette.inkSoft)
                 .padding(.top, 14)
                 .padding(.bottom, 8)
-            MemoField(text: $memo, focused: $memoFocused)
+            MemoField(text: $memo, focused: $memoFocused, reservedLines: 1)
                 .onChange(of: memoFocused) { _, f in onMemoFocus(f) }
             Button(L("きろくする")) {
                 store.saveToday(weight: weight, tags: tags, memo: memo)

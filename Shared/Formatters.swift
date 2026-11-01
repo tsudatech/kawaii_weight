@@ -6,7 +6,13 @@
 import Foundation
 
 extension Calendar {
-    static var app: Calendar { .current }
+    /// いつも西暦。端末の暦が和暦・仏暦でも、年が「8」「2569」にならないように（時間帯は端末に合わせる）
+    static var app: Calendar {
+        var c = Calendar(identifier: .gregorian)
+        c.timeZone = .current
+        c.locale = .current
+        return c
+    }
 }
 
 extension Date {

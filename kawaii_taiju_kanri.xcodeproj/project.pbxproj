@@ -451,7 +451,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = kawaii_taiju_kanri/kawaii_taiju_kanri.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = TGF4E76D8F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -488,7 +488,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = kawaii_taiju_kanri/kawaii_taiju_kanri.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = TGF4E76D8F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -523,7 +523,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = KawaiiWidget/KawaiiWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = TGF4E76D8F;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = KawaiiWidget/Info.plist;
@@ -552,7 +552,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = KawaiiWidget/KawaiiWidget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = TGF4E76D8F;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = KawaiiWidget/Info.plist;

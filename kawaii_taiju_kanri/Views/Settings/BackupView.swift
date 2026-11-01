@@ -13,13 +13,11 @@ struct BackupView: View {
     @EnvironmentObject private var store: WeightStore
     @ObservedObject private var ads = AdService.shared
     @ObservedObject var backup: ICloudBackup
-    /// 左端から右へスワイプしているときのずれ
-    @State private var swipe: CGFloat = 0
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                nav
+                SubpageNav(title: L("バックアップ")) { store.showBackup = false }
                 SettingsGroup(title: L("iCloud")) {
                     SettingsRow(icon: "☁️", iconBG: Color(hex: 0xE6F4F5), label: L("iCloudにバックアップ"), note: statusText, danger: false) {
                         CSSSwitch(isOn: Binding(get: { backup.isEnabled }, set: { backup.setEnabled($0) }), label: L("iCloudにバックアップ"))
@@ -50,24 +48,7 @@ struct BackupView: View {
         .overlay(alignment: .top) {
             Color.clear.frame(height: 0).background(Palette.paper.ignoresSafeArea(edges: .top))
         }
-        .overlay(alignment: .leading) { edgeSwipeArea }
-        .offset(x: swipe)
-        .shadow(color: Palette.ink.opacity(swipe > 0 ? 0.12 : 0), radius: 10, x: -4)
-    }
-
-    /// ‹ せってい ・ バックアップ（日の詳細の .dNav と同じ）
-    private var nav: some View {
-        HStack(spacing: 8) {
-            Button(L("‹ せってい")) { store.showBackup = false }
-                .frame(maxWidth: .infinity, alignment: .leading)
-            Text(L("バックアップ")).font(.ui(16, .black)).foregroundStyle(Palette.ink)
-            Color.clear.frame(maxWidth: .infinity, maxHeight: 1)
-        }
-        .font(.ui(15, .black))
-        .foregroundStyle(Palette.rose)
-        .buttonStyle(.plain)
-        .padding(.vertical, 4)
-        .padding(.top, 6).padding(.bottom, 10)
+        .edgeSwipeBack { store.showBackup = false }
     }
 
     /// 状態を1行で伝える。うまくいかなかった理由もここに出す
@@ -106,9 +87,50 @@ struct BackupView: View {
         .background(RoundedRectangle(cornerRadius: 16).fill(Color(hex: 0xFFF3D9)))
         .overlay(RoundedRectangle(cornerRadius: 16).strokeBorder(Palette.gold, lineWidth: 2))
     }
+}
 
+// MARK: - せっていから開く画面の部品（バックアップ・タグ）
+
+/// ‹ せってい ・ 見出し（日の詳細の .dNav と同じ）
+struct SubpageNav: View {
+    let title: String
+    let onBack: () -> Void
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Button(L("‹ せってい"), action: onBack)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            Text(title).font(.ui(16, .black)).foregroundStyle(Palette.ink)
+            Color.clear.frame(maxWidth: .infinity, maxHeight: 1)
+        }
+        .font(.ui(15, .black))
+        .foregroundStyle(Palette.rose)
+        .buttonStyle(.plain)
+        .padding(.vertical, 4)
+        .padding(.top, 6).padding(.bottom, 10)
+    }
+}
+
+extension View {
     /// 左端から右へ引っぱるともどる（日の詳細と同じ）
-    private var edgeSwipeArea: some View {
+    func edgeSwipeBack(_ onBack: @escaping () -> Void) -> some View {
+        modifier(EdgeSwipeBack(onBack: onBack))
+    }
+}
+
+private struct EdgeSwipeBack: ViewModifier {
+    let onBack: () -> Void
+    /// 左端から右へスワイプしているときのずれ
+    @State private var swipe: CGFloat = 0
+
+    func body(content: Content) -> some View {
+        content
+            .overlay(alignment: .leading) { area }
+            .offset(x: swipe)
+            .shadow(color: Palette.ink.opacity(swipe > 0 ? 0.12 : 0), radius: 10, x: -4)
+    }
+
+    private var area: some View {
         GeometryReader { geo in
             Color.clear
                 .frame(width: 20)
@@ -118,7 +140,7 @@ struct BackupView: View {
                         .onChanged { v in swipe = max(0, v.translation.width) }
                         .onEnded { v in
                             if v.translation.width > geo.size.width * 0.35 || v.predictedEndTranslation.width > geo.size.width * 0.6 {
-                                store.showBackup = false
+                                onBack()
                             } else {
                                 withAnimation(.slide) { swipe = 0 }
                             }

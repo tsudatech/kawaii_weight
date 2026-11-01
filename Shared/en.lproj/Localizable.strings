@@ -391,3 +391,22 @@
 "いまのままにする" = "Keep as is";
 "毎日はかってね通知" = "Daily weigh-in reminder";
 "毎日 %@ にお知らせします" = "I’ll remind you every day at %@";
+
+/* せってい › タグ */
+"タグを足す" = "Add a tag";
+"きょうのことのタグ" = "Tags for “About today”";
+"上にあるタグほど、ホームで先に見えるよ。消しても、これまでの記録に付いたタグはそのまま残るよ" = "Tags near the top show up first on Home. Removing a tag keeps it on your past logs.";
+"はじめのタグ" = "Default tags";
+"「飲み会」などのタグを付けた日は、キャラがやさしく受け止めてくれるよ" = "On days tagged “Night out” and so on, your buddy goes easy on you.";
+"はじめのタグをもどす" = "Restore default tags";
+"、" = ", ";
+"例：おやつ" = "e.g. Snacks";
+"たす" = "Add";
+"じぶんで足したタグ" = "Your own tag";
+"「%@」を上へ" = "Move “%@” up";
+"「%@」を消す" = "Remove “%@”";
+"タグは1つは残してね" = "Keep at least one tag";
+"タグの名前を入れてね" = "Type a tag name";
+"そのタグはもうあるよ" = "That tag already exists";
+"タグは%dこまでだよ" = "You can have up to %d tags";
+"「きょうのこと」のタグ・%dこ" = "Tags for “About today” · %d";

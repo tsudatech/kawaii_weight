@@ -36,11 +36,15 @@ final class WeightStore: ObservableObject {
     @Published var selectedTab: AppTab = .home
     @Published var editing: SheetTarget?
     @Published var celebrating: Badge?
+    /// お祝いを出す直前（記録から 0.7 秒のあいだ）。このあいだは全画面広告を出さない
+    private(set) var celebrationPending = false
     @Published var toast: String?
     @Published var showOnboarding = false
     @Published var showWidgetPreview = false
     /// せってい › バックアップ
     @Published var showBackup = false
+    /// せってい › タグ
+    @Published var showTags = false
     /// 「3日ぶりに開いた」状態を再現する（デバッグ用）
     @Published var simulateAbsent = false
     /// 日の詳細（カレンダー・りれきから開く）
@@ -502,8 +506,10 @@ final class WeightStore: ObservableObject {
         let fresh = now.filter { !earnedBadges.contains($0) }
         earnedBadges = Array(Set(earnedBadges + now))
         if let id = fresh.first, let badge = Badge.all.first(where: { $0.id == id }) {
+            celebrationPending = true
             Task {
                 try? await Task.sleep(for: .milliseconds(700))
+                celebrationPending = false
                 celebrating = badge
             }
         }
@@ -563,6 +569,36 @@ final class WeightStore: ObservableObject {
             if entries[d] == nil { return d }
         }
         return Date.today.adding(days: -1)
+    }
+
+    // MARK: - タグ
+
+    /// タグを足す。足せなかったときは、その理由（トーストに出す文言）を返す。
+    /// はじめからあるタグは日本語のまま持つので、表示名（L(t)）とも重ならないようにする
+    @discardableResult
+    func addTag(_ name: String) -> String? {
+        let t = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !t.isEmpty else { return L("タグの名前を入れてね") }
+        guard !settings.tags.contains(where: { $0 == t || L($0) == t }) else { return L("そのタグはもうあるよ") }
+        guard settings.tags.count < DayTag.maxCount else { return LF("タグは%dこまでだよ", DayTag.maxCount) }
+        // 訳のあるはじめのタグを、訳の名前で足したときは、日本語のキーにもどす（キャラの反応が効くように）
+        settings.tags.append(DayTag.all.first { L($0) == t } ?? String(t.prefix(DayTag.maxLength)))
+        return nil
+    }
+
+    /// 一覧から消す。これまでの記録に付いたタグはそのまま残る
+    func removeTag(_ tag: String) {
+        settings.tags.removeAll { $0 == tag }
+    }
+
+    func moveTagUp(_ tag: String) {
+        guard let i = settings.tags.firstIndex(of: tag), i > 0 else { return }
+        settings.tags.swapAt(i, i - 1)
+    }
+
+    /// 消した「はじめのタグ」を、うしろに足しなおす
+    func restoreDefaultTags() {
+        settings.tags += DayTag.all.filter { !settings.tags.contains($0) }
     }
 
     // MARK: - トースト

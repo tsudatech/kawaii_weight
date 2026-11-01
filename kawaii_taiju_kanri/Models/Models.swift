@@ -28,6 +28,9 @@ struct DeletedEntry: Codable, Equatable {
 /// 日のタグ。保存するのは日本語のまま（キー）で、表示するときに L(tag) で訳す
 enum DayTag {
     static let all = ["飲み会", "外食", "寝不足", "のんびり", "運動した"]
+    /// 自分で足すタグの、名前の長さと数の上限
+    static let maxLength = 10
+    static let maxCount = 20
 
     /// 増えた日にタグがあると、キャラがやさしく受け止める
     static let reactions: [(tag: String, mood: Mood, line: String)] = [
@@ -55,6 +58,8 @@ struct AppSettings: Equatable, Codable {
     var move = true
     var strict = false
     var judge: JudgeMode = .trend
+    /// 「きょうのこと」に出すタグ（せってい › タグ で足したり消したりする）。はじめは DayTag.all
+    var tags: [String] = DayTag.all
 }
 
 // あとから項目が増えても、古い保存データを読めるようにする
@@ -70,6 +75,7 @@ extension AppSettings {
         move = try c.decodeIfPresent(Bool.self, forKey: .move) ?? d.move
         strict = try c.decodeIfPresent(Bool.self, forKey: .strict) ?? d.strict
         judge = try c.decodeIfPresent(JudgeMode.self, forKey: .judge) ?? d.judge
+        tags = try c.decodeIfPresent([String].self, forKey: .tags) ?? d.tags
     }
 }
 

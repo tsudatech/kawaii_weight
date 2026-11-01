@@ -10,6 +10,8 @@ SwiftUI の iPhone アプリ ＋ ホーム画面ウィジェット（`KawaiiWidg
   英語の単数・複数は `Shared/en.lproj/Localizable.stringsdict`。`Shared/` はアプリとウィジェットの両方に入る。
 - 追加したら `python3 tools/check_strings.py` で足りないキーがないか確かめる（最後に OK が出ればよい）。
 - 日のタグ（`DayTag.all`）は日本語のまま保存するキー。表示するときだけ `L(tag)` で訳す。キーは変えないこと。
+  「きょうのこと」に出すタグの一覧は `AppSettings.tags`（せってい › タグ・`Views/Settings/TagsView.swift`。はじめは `DayTag.all`）。
+  自分で足したタグは訳がないので、`L(tag)` でも書いたとおりに出る。一覧はせっていなので端末ごと（iCloud には預けない）。
 - 日付は `Fmt`（`Shared/Formatters.swift`）が言語ごとに出し分ける（10月28日（水） / Wed, Oct 28）。
 - アプリの表示名は `kawaii_taiju_kanri/{ja,en}.lproj/InfoPlist.strings`。
   App Store の名前は「かわいい体重きろく：…」（英語は Weight Buddy: …）で、ホーム画面の表示名は「体重きろく」のまま（`体重きろく_AppStore掲載情報.md`）。

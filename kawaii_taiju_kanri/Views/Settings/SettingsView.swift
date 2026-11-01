@@ -16,6 +16,7 @@ struct SettingsView: View {
             ScreenHeader(caption: L("じぶん好みに"), title: L("せってい"))
             bodyGroup.coachTarget("settings.body").padding(.top, 4)
             judgeGroup.coachTarget("settings.judge").padding(.top, 18)
+            recordGroup.padding(.top, 18)
             notifyGroup.padding(.top, 18)
             widgetGroup.padding(.top, 18)
             charaGroup.padding(.top, 18)
@@ -80,6 +81,17 @@ struct SettingsView: View {
                 )
             }
             SettingsToggleRow(icon: "🍰", iconBG: Palette.blush, label: L("きびしめモード"), isOn: $store.settings.strict)
+        }
+    }
+
+    // MARK: - きろく
+
+    private var recordGroup: some View {
+        SettingsGroup(title: L("きろく")) {
+            SettingsButtonRow(icon: "🏷️", iconBG: Color(hex: 0xFDF0DC), label: L("タグ"),
+                              note: LF("「きょうのこと」のタグ・%dこ", store.settings.tags.count)) {
+                store.showTags = true
+            }
         }
     }
 
