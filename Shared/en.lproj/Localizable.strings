@@ -410,3 +410,4 @@
 "そのタグはもうあるよ" = "That tag already exists";
 "タグは%dこまでだよ" = "You can have up to %d tags";
 "「きょうのこと」のタグ・%dこ" = "Tags for “About today” · %d";
+"タグの名前は%d文字までだよ" = "Tag names can be up to %d characters";

@@ -38,7 +38,9 @@ struct TagsView: View {
                     SettingsGroup(title: L("はじめのタグ"), footer: L("「飲み会」などのタグを付けた日は、キャラがやさしく受け止めてくれるよ")) {
                         SettingsButtonRow(icon: "↩️", iconBG: Color(hex: 0xF3EEE9), label: L("はじめのタグをもどす"),
                                           note: missingDefaults.map { L($0) }.joined(separator: L("、"))) {
-                            withAnimation(.cssEase(0.25)) { store.restoreDefaultTags() }
+                            withAnimation(.cssEase(0.25)) {
+                                if let error = store.restoreDefaultTags() { store.showToast(error) }
+                            }
                         }
                     }
                     .padding(.top, 18)
@@ -80,9 +82,6 @@ struct TagsView: View {
                 .padding(.vertical, 10).padding(.horizontal, 12)
                 .background(RoundedRectangle(cornerRadius: 12).fill(Palette.paper))
                 .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(Palette.line, lineWidth: 2))
-                .onChange(of: newTag) { _, v in
-                    if v.count > DayTag.maxLength { newTag = String(v.prefix(DayTag.maxLength)) }
-                }
             Button(L("たす"), action: add)
                 .font(.ui(14, .black))
                 .foregroundStyle(.white)

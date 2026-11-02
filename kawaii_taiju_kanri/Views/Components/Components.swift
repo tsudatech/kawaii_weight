@@ -309,34 +309,56 @@ struct MemoField: View {
             .padding(.vertical, 12).padding(.horizontal, 14)
             .background(RoundedRectangle(cornerRadius: 14).fill(Palette.paper))
             .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Palette.line, lineWidth: 2))
-            .onChange(of: text) { _, v in if v.count > 60 { text = String(v.prefix(60)) } }
+            // 打っているあいだは切らない（日本語の変換中に切ると、変換がこわれるため）。
+            // 超えたら数を出して、入力欄からはなれたとき・保存するときに切る
+            .overlay(alignment: .bottomTrailing) {
+                if text.count > Self.limit {
+                    Text("\(text.count)/\(Self.limit)")
+                        .font(.num(11, .bold))
+                        .foregroundStyle(Palette.up)
+                        .padding(.trailing, 12).padding(.bottom, 6)
+                }
+            }
+            .onChange(of: focused.wrappedValue) { _, f in
+                if !f && text.count > Self.limit { text = Self.clip(text) }
+            }
     }
+
+    static let limit = WeightEntry.memoLimit
+    static func clip(_ s: String) -> String { String(s.prefix(limit)) }
 }
 
 struct TagPicker: View {
     @EnvironmentObject private var store: WeightStore
     @Binding var selected: [String]
+    /// 一覧から消したけれど、この日に付いていたタグ。外しても消さずに出しておく（つけなおせるように）
+    @State private var kept: [String] = []
     /// 1行にして横にスクロールする（ホームで「きろくする」まで見えるように）。
     /// カードの左右の余白（bleed）まではみ出して、端で切れて見えるようにする
     var singleLine = false
     var bleed: CGFloat = 16
 
     var body: some View {
-        if singleLine {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 6) { chips }
-                    .padding(.vertical, 2)
+        Group {
+            if singleLine {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) { chips }
+                        .padding(.vertical, 2)
+                }
+                .contentMargins(.horizontal, bleed, for: .scrollContent)
+                .padding(.horizontal, -bleed)
+            } else {
+                FlowLayout(spacing: 6) { chips }
             }
-            .contentMargins(.horizontal, bleed, for: .scrollContent)
-            .padding(.horizontal, -bleed)
-        } else {
-            FlowLayout(spacing: 6) { chips }
+        }
+        .onChange(of: selected, initial: true) { _, s in
+            kept += s.filter { !store.settings.tags.contains($0) && !kept.contains($0) }
         }
     }
 
     /// せっていのタグ。一覧から消したタグも、この日に付いていれば出す（外せるように）
     private var tags: [String] {
-        store.settings.tags + selected.filter { !store.settings.tags.contains($0) }
+        store.settings.tags + kept.filter { !store.settings.tags.contains($0) }
     }
 
     private var chips: some View {

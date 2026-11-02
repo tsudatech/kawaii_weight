@@ -7,6 +7,9 @@ import Foundation
 
 /// 1日ぶんの記録
 struct WeightEntry: Identifiable, Equatable, Codable {
+    /// ひとことメモの長さの上限
+    static let memoLimit = 60
+
     var id: Date { date }
     let date: Date
     var weight: Double

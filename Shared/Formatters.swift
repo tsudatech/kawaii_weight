@@ -7,12 +7,13 @@ import Foundation
 
 extension Calendar {
     /// いつも西暦。端末の暦が和暦・仏暦でも、年が「8」「2569」にならないように（時間帯は端末に合わせる）
-    static var app: Calendar {
+    /// 何度も使うので1回だけ作る。時間帯・言語は autoupdating にして、端末の設定を変えたらついていく
+    static let app: Calendar = {
         var c = Calendar(identifier: .gregorian)
-        c.timeZone = .current
-        c.locale = .current
+        c.timeZone = .autoupdatingCurrent
+        c.locale = .autoupdatingCurrent
         return c
-    }
+    }()
 }
 
 extension Date {

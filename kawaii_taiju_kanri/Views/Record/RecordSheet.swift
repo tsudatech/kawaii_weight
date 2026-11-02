@@ -243,7 +243,7 @@ struct RecordSheet: View {
     }
 
     private func save() {
-        let trimmed = memo.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmed = MemoField.clip(memo).trimmingCharacters(in: .whitespacesAndNewlines)
         // えらび直したときはその顔を、触っていなければ前の選択をそのまま残す
         let pickedFace = faceTouched ? face : store.entries[date]?.face
         store.save(WeightEntry(

@@ -37,7 +37,9 @@ final class WeightStore: ObservableObject {
     @Published var editing: SheetTarget?
     @Published var celebrating: Badge?
     /// お祝いを出す直前（記録から 0.7 秒のあいだ）。このあいだは全画面広告を出さない
-    private(set) var celebrationPending = false
+    var celebrationPending: Bool { pendingCelebrations > 0 }
+    /// 出る直前のお祝いの数（つづけて記録して重なっても、最後のが出るまで数える）
+    private var pendingCelebrations = 0
     @Published var toast: String?
     @Published var showOnboarding = false
     @Published var showWidgetPreview = false
@@ -506,10 +508,10 @@ final class WeightStore: ObservableObject {
         let fresh = now.filter { !earnedBadges.contains($0) }
         earnedBadges = Array(Set(earnedBadges + now))
         if let id = fresh.first, let badge = Badge.all.first(where: { $0.id == id }) {
-            celebrationPending = true
+            pendingCelebrations += 1
             Task {
                 try? await Task.sleep(for: .milliseconds(700))
-                celebrationPending = false
+                pendingCelebrations -= 1
                 celebrating = badge
             }
         }
@@ -522,7 +524,7 @@ final class WeightStore: ObservableObject {
         var e = entries[.today] ?? WeightEntry(date: .today, weight: weight)
         e.weight = (weight * 10).rounded() / 10
         e.tags = tags
-        let trimmed = memo.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmed = String(memo.prefix(WeightEntry.memoLimit)).trimmingCharacters(in: .whitespacesAndNewlines)
         if !trimmed.isEmpty { e.memo = trimmed }
         entries[.today] = e
         simulateAbsent = false
@@ -579,10 +581,12 @@ final class WeightStore: ObservableObject {
     func addTag(_ name: String) -> String? {
         let t = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !t.isEmpty else { return L("タグの名前を入れてね") }
+        // 入力欄では切らない（日本語の変換中に切ると、変換がこわれるため）
+        guard t.count <= DayTag.maxLength else { return LF("タグの名前は%d文字までだよ", DayTag.maxLength) }
         guard !settings.tags.contains(where: { $0 == t || L($0) == t }) else { return L("そのタグはもうあるよ") }
         guard settings.tags.count < DayTag.maxCount else { return LF("タグは%dこまでだよ", DayTag.maxCount) }
         // 訳のあるはじめのタグを、訳の名前で足したときは、日本語のキーにもどす（キャラの反応が効くように）
-        settings.tags.append(DayTag.all.first { L($0) == t } ?? String(t.prefix(DayTag.maxLength)))
+        settings.tags.append(DayTag.all.first { L($0) == t } ?? t)
         return nil
     }
 
@@ -596,9 +600,13 @@ final class WeightStore: ObservableObject {
         settings.tags.swapAt(i, i - 1)
     }
 
-    /// 消した「はじめのタグ」を、うしろに足しなおす
-    func restoreDefaultTags() {
-        settings.tags += DayTag.all.filter { !settings.tags.contains($0) }
+    /// 消した「はじめのタグ」を、うしろに足しなおす（上限まで）。足せなかった分があれば、その理由を返す
+    @discardableResult
+    func restoreDefaultTags() -> String? {
+        let missing = DayTag.all.filter { !settings.tags.contains($0) }
+        let room = max(0, DayTag.maxCount - settings.tags.count)
+        settings.tags += missing.prefix(room)
+        return missing.count > room ? LF("タグは%dこまでだよ", DayTag.maxCount) : nil
     }
 
     // MARK: - トースト
