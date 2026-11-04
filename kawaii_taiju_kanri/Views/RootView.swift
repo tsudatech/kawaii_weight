@@ -17,6 +17,7 @@ extension Animation {
 struct RootView: View {
     @EnvironmentObject private var store: WeightStore
     @ObservedObject private var ads = AdService.shared
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         ZStack {
@@ -64,9 +65,33 @@ struct RootView: View {
                     .zIndex(11)
             }
 
+            // シェアカード
+            if store.sharingDate != nil {
+                Color(hex: 0x2B1C12).opacity(0.35)
+                    .ignoresSafeArea()
+                    .onTapGesture { store.sharingDate = nil }
+                    .transition(.opacity.animation(.cssEase(0.25)))
+                    .zIndex(10)
+            }
+            if let date = store.sharingDate {
+                ShareSheet(date: date)
+                    .transition(.move(edge: .bottom))
+                    .zIndex(11)
+            }
+
             if store.showWidgetPreview {
                 WidgetPreviewView()
                     .transition(.opacity.combined(with: .scale(scale: 1.06)))
+                    .zIndex(12)
+            }
+            if store.showLockPreview {
+                LockPreviewView()
+                    .transition(.opacity.combined(with: .scale(scale: 1.04)))
+                    .zIndex(12)
+            }
+            if store.showSiriPreview {
+                SiriPreviewView()
+                    .transition(.opacity.combined(with: .scale(scale: 1.04)))
                     .zIndex(12)
             }
             if store.showOnboarding {
@@ -79,6 +104,14 @@ struct RootView: View {
                     .id(badge.id)
                     .transition(.opacity)
                     .zIndex(14)
+            }
+            // もやもやがはれたときの紙ふぶき（押せるものをふさがない）
+            if let key = store.confettiKey, !reduceMotion {
+                ConfettiView()
+                    .id(key)
+                    .allowsHitTesting(false)
+                    .ignoresSafeArea()
+                    .zIndex(15)
             }
         }
         // はじめての案内（コーチマーク）。部品の位置は .coachTarget(_:) の印から
@@ -111,6 +144,9 @@ struct RootView: View {
         .animation(.slide, value: store.showBackup)
         .animation(.slide, value: store.showTags)
         .animation(.slide, value: store.editing)
+        .animation(.slide, value: store.sharingDate)
+        .animation(.cssEase(0.3), value: store.showLockPreview)
+        .animation(.cssEase(0.3), value: store.showSiriPreview)
         .animation(.cssEase(0.3), value: store.showOnboarding)
         .animation(.cssEase(0.3), value: store.showWidgetPreview)
         .animation(.cssEase(0.3), value: store.celebrating)
@@ -152,6 +188,7 @@ struct RootView: View {
     private var canShowCoach: Bool {
         store.onboarded && !store.showOnboarding && store.editing == nil && store.detailDate == nil
             && store.celebrating == nil && !store.showWidgetPreview && !store.showBackup && !store.showTags && store.coach == nil
+            && store.sharingDate == nil && !store.showLockPreview && !store.showSiriPreview
     }
 
     /// 各タブの案内。画面に見えていない部品のページは飛ばす
@@ -231,7 +268,7 @@ struct TabBar: View {
             // 何回か記録したあとの、つぎのタブ切りかえで全画面広告。いま開いているタブを押しなおしたときは出さない。
             // お祝い（出る直前も）・シート・案内と重なるとき、切りかえた先でこれから案内が出るときは見送る
             guard switched else { return }
-            let busy = store.celebrating != nil || store.celebrationPending || store.editing != nil
+            let busy = store.celebrating != nil || store.celebrationPending || store.editing != nil || store.sharingDate != nil
                 || store.coach != nil || Onboarding.needs(tab.coachKind)
             AdService.shared.showInterstitialIfDue(isBusy: busy)
         } label: {

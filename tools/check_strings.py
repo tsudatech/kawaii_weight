@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""L("…") / LF("…") / .failure("…") のキーが、ja・en の両方の訳文に入っているかを確かめる。
+"""L("…") / LF("…") / .failure("…") / App Intents の文言のキーが、ja・en の両方の訳文に入っているかを確かめる。
 
     python3 tools/check_strings.py   # 足りなければ一覧を出して終了コード 1
 
@@ -22,9 +22,16 @@ def keys_in_code():
     for pattern in SOURCES:
         for path in sorted(glob.glob(str(ROOT / pattern), recursive=True)):
             # .failure("…") は、出すときに L() で訳す鍵（Store/ICloudBackup.swift）
-            for m in re.finditer(r'(?:\bLF?|\.failure)\("((?:[^"\\]|\\.)*)"', Path(path).read_text()):
-                if m.group(1) not in keys:
-                    keys.append(m.group(1))
+            # App Intents の文言は、Localizable.strings から iOS が引く
+            for m in re.finditer(
+                r'''(?:\bLF?|\.failure|IntentDescription|IntentDialog|\.displayName|\.description)\("((?:[^"\\]|\\.)*)"'''
+                r'''|LocalizedStringResource = "((?:[^"\\]|\\.)*)"'''
+                r'''|(?:shortTitle|@Parameter\(title): "((?:[^"\\]|\\.)*)"''',
+                Path(path).read_text(),
+            ):
+                key = m.group(1) or m.group(2) or m.group(3)
+                if key not in keys:
+                    keys.append(key)
     return keys + [t for t in TAGS if t not in keys]
 
 

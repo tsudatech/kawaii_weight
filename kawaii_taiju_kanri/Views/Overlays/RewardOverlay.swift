@@ -71,8 +71,8 @@ struct ConfettiView: View {
     }
 
     @State private var start = Date()
-    @State private var pieces: [Piece] = []
-    private let colors = [Palette.cheek, Palette.rose, Palette.gold, Palette.mint, Palette.sky, .white]
+    // onAppear で作ると Canvas に届かないことがあるので、はじめから作っておく
+    @State private var pieces = Self.makePieces()
 
     var body: some View {
         TimelineView(.animation) { tl in
@@ -92,19 +92,21 @@ struct ConfettiView: View {
                 }
             }
         }
-        .onAppear {
-            start = Date()
-            pieces = (0..<110).map { _ in
-                Piece(
-                    x0: Double.random(in: -30...30),
-                    vx: Double.random(in: -4.5...4.5),
-                    vy: -Double.random(in: 4...15),
-                    size: Double.random(in: 4...10),
-                    spin: Double.random(in: -0.15...0.15),
-                    color: colors.randomElement() ?? .white,
-                    round: Double.random(in: 0...1) < 0.4
-                )
-            }
+        .onAppear { start = Date() }
+    }
+
+    private static func makePieces() -> [Piece] {
+        let colors = [Palette.cheek, Palette.rose, Palette.gold, Palette.mint, Palette.sky, .white]
+        return (0..<110).map { _ in
+            Piece(
+                x0: Double.random(in: -30...30),
+                vx: Double.random(in: -4.5...4.5),
+                vy: -Double.random(in: 4...15),
+                size: Double.random(in: 4...10),
+                spin: Double.random(in: -0.15...0.15),
+                color: colors.randomElement() ?? .white,
+                round: Double.random(in: 0...1) < 0.4
+            )
         }
     }
 }

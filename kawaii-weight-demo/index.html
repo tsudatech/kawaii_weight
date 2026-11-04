@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>かわいい体重管理</title>
+<title>たいかん！</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Baloo+2:wght@600;700;800&display=swap">
 <link rel="stylesheet" href="css/style.css">
@@ -22,7 +22,7 @@
       <!-- ===== ホーム ===== -->
       <div class="screen" id="sc-home" role="tabpanel">
         <div class="top">
-          <div><div class="date" id="today"></div><h1>きろく</h1></div>
+          <div><div class="date" id="today"></div><h1>きろく<span class="hideBadge">見ないモード</span></h1></div>
           <div class="pill" title="連続記録日数">🔥<b id="streak">0</b>日</div>
         </div>
         <div class="demoBar" id="absentBar" hidden><span>デモ：3日ぶりにアプリを開いた状態を再現しています</span><button id="absentOff">もどす</button></div>
@@ -33,7 +33,7 @@
             <div class="doneInfo" id="doneInfo" hidden>
               <div class="big"><span id="dW">—</span><small>kg</small></div>
               <div class="delta" id="dDelta"></div>
-              <button class="editLink" id="dEdit">記録を修正</button>
+              <div class="doneLinks"><button class="shareBtn" id="dShareHome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7.5 7.5 12 3l4.5 4.5"/><path d="M5 12v7.5h14V12"/></svg>シェア</button><button class="editLink" id="dEdit">記録を修正</button></div>
             </div>
           </div>
           <div class="facePick" id="facePick" hidden>
@@ -41,13 +41,22 @@
             <div class="fpRow" id="fpRow" role="group" aria-label="きょうのきぶん"></div>
           </div>
           <div class="heroStats" id="heroStats">
-            <div class="hs"><span id="sDiffL">7日平均から</span><b id="sDiff">—</b></div>
-            <div class="hs"><span>もくひょう</span><b id="sGoal">—</b></div>
-            <div class="hs"><span>あと</span><b id="sLeft">—</b></div>
+            <div class="hs"><span id="sDiffL">7日平均から</span><b id="sDiff" class="nv">—</b></div>
+            <div class="hs"><span>もくひょう</span><b id="sGoal" class="nv">—</b></div>
+            <div class="hs"><span>あと</span><b id="sLeft" class="nv">—</b></div>
           </div>
         </section>
         <section class="card" id="recCard" aria-label="きょうの体重">
-          <h2>きょうの体重 <small id="recState">まだ記録してないよ</small></h2>
+          <h2>きょうの体重 <span style="display:flex;gap:6px;align-items:center"><small id="recState">まだ記録してないよ</small><button class="hkBtn" id="hkBtn" aria-label="ヘルスケアから体重を読みこむ"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.6-9.3C1 8.4 3 5 6.4 5c2 0 3.6 1.1 4.6 2.6h2C14 6.1 15.6 5 17.6 5 21 5 23 8.4 21.6 11.7 19.5 16.4 12 21 12 21z"/></svg>ヘルスケア</button></span></h2>
+          <div class="guess" id="guessBox">
+            <div class="gHead"><span>よそう</span><small id="gRef"></small></div>
+            <div class="gBtns" id="gBtns" role="group" aria-label="体重のよそう">
+              <button data-g="up" aria-pressed="false"><b>↑</b>ふえた</button>
+              <button data-g="same" aria-pressed="false"><b>→</b>おなじ</button>
+              <button data-g="down" aria-pressed="false"><b>↓</b>へった</button>
+            </div>
+            <div class="gBot" id="gBot"></div>
+          </div>
           <div class="stepper">
             <button class="stepBtn" id="minus" aria-label="0.1kg 減らす">−</button>
             <div class="weightVal"><input id="wInput" inputmode="decimal" aria-label="体重 (kg)"><span>kg</span></div>
@@ -57,6 +66,17 @@
           <div class="chips" id="homeTags"></div>
           <button class="save" id="save">きろくする</button>
         </section>
+        <section class="card" id="guessRes" aria-label="体重よそうの結果" hidden>
+          <h2>体重よそう <small id="grPts"></small></h2>
+          <div class="gRes" id="grBody"></div>
+          <div class="gFoot" id="grFoot"></div>
+        </section>
+        <section class="card watch" id="watchCard" aria-label="もどるまで見守り" hidden>
+          <h2>もどるまで見守り <small id="wSince"></small></h2>
+          <div class="wRow"><div class="cloud" id="wCloud"></div><div class="wTxt"><b id="wTitle"></b><small id="wSub"></small></div></div>
+          <div class="wBar"><i id="wBar" style="width:0"></i></div>
+        </section>
+        <section class="card treat" id="treatCard" aria-label="ごほうびの日" hidden></section>
         <section class="card goalCard" aria-label="もくひょうまで">
           <h2>もくひょうまで <span><b id="gPct">0</b><small> %</small></span></h2>
           <div class="track" id="track">
@@ -65,7 +85,7 @@
             <svg class="flagG" viewBox="0 0 26 42" aria-hidden="true"><rect x="3" y="2" width="2.5" height="40" rx="1.2" fill="#4A3020"/><path d="M5.5 3h17l-4 6 4 6h-17z" fill="#E58C86"/><circle cx="4.2" cy="2.5" r="2.5" fill="#F3CA89"/></svg>
             <span class="runner" id="gRunner"></span>
           </div>
-          <div class="trackLbl"><span>スタート <b id="gStart"></b></span><span>ゴール <b id="gGoal"></b></span></div>
+          <div class="trackLbl"><span>スタート <b id="gStart" class="nv"></b></span><span>ゴール <b id="gGoal" class="nv"></b></span></div>
           <button class="cheer" id="cheer" aria-label="おうえんメッセージ（タップで次のメッセージ）">
             <span class="cheerFace" id="cheerFace"></span>
             <span class="cheerTxt"><b id="cheerMsg"></b><small id="cheerSub"></small></span>
@@ -99,10 +119,10 @@
         <div class="stats" id="stats"></div>
         <section class="card">
           <h2>BMI <small id="bmiH">身長 160cm で計算</small></h2>
-          <div class="bmiRow"><div class="bmiNum" id="bmiNum">—</div><div class="bmiFace" id="bmiFace"></div></div>
+          <div class="bmiRow"><div class="bmiNum nv" id="bmiNum">—</div><div class="bmiFace" id="bmiFace"></div></div>
           <div class="gauge"><i style="width:18.5%"></i><i style="width:32.5%"></i><i style="width:25%"></i><i style="width:24%"></i><span class="mk" id="bmiMk"></span></div>
           <div class="gaugeLbl"><span style="left:18.5%">18.5</span><span style="left:51%">25</span><span style="left:76%">30</span></div>
-          <div class="fatLine"><span>体脂肪率（さいしん）</span><span id="fatNow">—</span></div>
+          <div class="fatLine"><span>体脂肪率（さいしん）</span><span id="fatNow" class="nv">—</span></div>
         </section>
         <section class="card">
           <h2>カレンダー
@@ -129,6 +149,18 @@
           <div class="lv"><b id="lvNum">Lv.1</b><span id="lvTitle" style="font-weight:700"></span></div>
           <div class="bar"><i id="lvBar" style="width:0"></i></div>
           <div class="hint">毎日きろくすると、なかよし度が上がるよ</div>
+        </section>
+        <section class="card" id="gmCard">
+          <h2>体重よそう <small id="gmPts"></small></h2>
+          <div class="lv"><b id="gmLv">Lv.1</b><span id="gmTitle" style="font-weight:700"></span></div>
+          <div class="bar"><i id="gmBar" style="width:0"></i></div>
+          <div class="gFoot" id="gmFoot"></div>
+          <div class="hint">はかる前に、まえの記録より「ふえた・おなじ・へった」を当てるゲーム。±0.1kg までは「おなじ」。あたると 10pt、キャラとちがうよそうで当てると +5pt</div>
+        </section>
+        <section class="card">
+          <h2>はらした もやもや <small id="clCount"></small></h2>
+          <ul class="clList" id="clList"></ul>
+          <div class="hint">飲み会・外食・ごほうびの日のあとに増えてから、もとの体重にもどるまでの日数だよ</div>
         </section>
         <section class="card">
           <h2>ごほうび <small id="badgeCount"></small></h2>
@@ -172,9 +204,26 @@
           </div>
         </div>
         <div class="group">
-          <h3>ウィジェット</h3>
+          <h3>あそび</h3>
           <div class="list">
+            <div class="row"><span class="ri" style="background:#FFF3D9">🎯</span><label for="optGame" class="lbl">体重よそう<small>はかる前に「ふえた・おなじ・へった」を当てるゲーム</small></label><input type="checkbox" class="sw" id="optGame" data-opt="game"></div>
+          </div>
+          <div class="hint" style="margin:6px 14px 0">オンにすると、ホームの体重入力に「よそう」が出るよ。あたるとポイントがたまって、キャラタブに成績が出るよ</div>
+        </div>
+        <div class="group">
+          <h3>見ないモード</h3>
+          <div class="list">
+            <div class="row"><span class="ri" style="background:#F3EEE9">👀</span><label for="optHide">体重の数字をかくす</label><input type="checkbox" class="sw" id="optHide" data-opt="hide"></div>
+          </div>
+          <div class="hint" style="margin:6px 14px 0">数字を見たくない日に。体重はぼかして、キャラの表情とことばだけで伝えるよ。記録はいつもどおりできるよ</div>
+        </div>
+        <div class="group">
+          <h3>iPhone とのれんけい</h3>
+          <div class="list">
+            <div class="row"><span class="ri" style="background:#FDECEC">❤️</span><label for="optHealth" class="lbl">ヘルスケアと同期<small>体重計アプリの記録を読みこみ、ここでの記録も書きこむよ</small></label><input type="checkbox" class="sw" id="optHealth" data-opt="health"></div>
             <button class="row" data-preview="widget"><span class="ri" style="background:#E6F4F5">🧩</span><span class="lbl">ホーム画面ウィジェット<span class="preTag">プレビュー</span><small>きょうの表情と体重が見られるよ</small></span><span class="chev">›</span></button>
+            <button class="row" data-preview="lock"><span class="ri" style="background:#E6F4F5">🔒</span><span class="lbl">ロック画面ウィジェット<span class="preTag">プレビュー</span><small>ロックしたまま見られて、1タップで記録できるよ</small></span><span class="chev">›</span></button>
+            <button class="row" data-preview="siri"><span class="ri" style="background:#EFEAF8">🎙️</span><span class="lbl">Siri・ショートカット<span class="preTag">プレビュー</span><small>「Hey Siri、体重を52キロで記録」</small></span><span class="chev">›</span></button>
           </div>
         </div>
         <div class="group">
@@ -197,7 +246,7 @@
         </div>
         <div class="group">
           <h3>このアプリについて</h3>
-          <div class="list"><div class="row"><span class="lbl">バージョン</span><span style="font-family:var(--font-num);font-weight:700;color:var(--ink-soft)">0.4 デモ</span></div></div>
+          <div class="list"><div class="row"><span class="lbl">バージョン</span><span style="font-family:var(--font-num);font-weight:700;color:var(--ink-soft)">0.5 デモ</span></div></div>
         </div>
         <div class="bye" id="bye"></div>
       </div>
@@ -217,15 +266,16 @@
       <div class="dStage">
         <div class="bubble b fix" id="dBubble"></div>
         <div class="dChar" id="dChar"></div>
-        <div class="dBig"><span id="dWeight"></span><small>kg</small></div>
+        <div class="dBig nv"><span id="dWeight"></span><small>kg</small></div>
         <div class="dSub" id="dSub"></div>
+        <button class="dShare" id="dShareDay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7.5 7.5 12 3l4.5 4.5"/><path d="M5 12v7.5h14V12"/></svg>この日をカードにしてシェア</button>
       </div>
-      <div class="dMetrics" id="dMetrics"></div>
+      <div class="dMetrics nvb" id="dMetrics"></div>
       <section class="card">
         <h2>前後1週間 <small>この日を●で表示</small></h2>
         <svg class="chart" id="dChart" viewBox="0 0 320 150" role="img" aria-label="前後1週間の体重グラフ"></svg>
       </section>
-      <section class="card dMemo"><h2>この日のこと</h2><div class="chips" id="dTags"></div><p id="dMemoTxt"></p></section>
+      <section class="card dMemo"><h2>この日のこと</h2><div class="chips" id="dTags"></div><p id="dMemoTxt"></p><p class="dGuess" id="dGuess" hidden></p></section>
       <div class="dPN"><button id="dPrev"></button><button id="dNext"></button></div>
     </section>
 
@@ -276,10 +326,31 @@
       <button class="del" id="shDel">この日の記録を削除</button>
     </section>
 
+    <!-- シェア -->
+    <div class="back" id="shareBack"></div>
+    <section class="sheet" id="shareSheet" role="dialog" aria-modal="true" aria-label="カードをシェア" inert>
+      <div class="grab" aria-hidden="true"></div>
+      <div class="shHead"><span style="width:32px"></span><h3>カードをシェア</h3><button class="close" id="shareClose" aria-label="とじる">×</button></div>
+      <div class="shPrev"><canvas id="shareCv" width="1080" height="1350" role="img" aria-label="シェア用のカード"></canvas></div>
+      <div class="shOpts">
+        <div class="line"><span>カード</span><span class="seg" role="group" aria-label="カードの種類" id="shKind"><button data-kind="day" aria-pressed="true">この日</button><button data-kind="week" aria-pressed="false">1週間</button></span></div>
+        <div class="line"><label for="shNum">体重の数字をのせる</label><input type="checkbox" class="sw" id="shNum"></div>
+        <div class="line"><span>いろ</span><span class="swatches" id="shBg"></span></div>
+      </div>
+      <div class="shTargets" id="shTargets">
+        <button data-t="LINE"><i style="background:#4CC764">LINE</i>LINE</button>
+        <button data-t="X"><i style="background:#1F1A17">X</i>X</button>
+        <button data-t="Instagram"><i style="background:linear-gradient(45deg,#F5A35C,#E0526F,#9B5BD0)">IG</i>Instagram</button>
+        <button data-t="メッセージ"><i style="background:#5BC56B">💬</i>メッセージ</button>
+        <button data-t="save"><i style="background:#8C7564">⤓</i>画像を保存</button>
+      </div>
+      <div class="shNote">体重の数字は、のせるを選んだときだけカードに入ります。<br>デモでは共有先は動きません（実機では iPhone の共有メニューが開きます）</div>
+    </section>
+
     <!-- 通知プレビュー -->
     <button class="notif" id="notif" aria-label="通知（タップでとじる）" tabindex="-1">
       <span class="appIcon" id="notifIcon"></span>
-      <span class="nb"><span class="nt"><span>かわいい体重管理</span><span>いま</span></span><span class="nh" id="notifTitle"></span><br><span id="notifBody"></span></span>
+      <span class="nb"><span class="nt"><span>たいかん！</span><span>いま</span></span><span class="nh" id="notifTitle"></span><br><span id="notifBody"></span></span>
     </button>
 
     <!-- ウィジェットプレビュー（ホーム画面） -->
@@ -287,6 +358,11 @@
       <div class="sbGrid" id="sbGrid"></div>
       <div class="sbNote"><span>ウィジェットのみため（プレビュー）。実機ではiPhoneのホーム画面に置けます</span><button id="sbClose">アプリにもどる</button></div>
     </div>
+
+    <!-- ロック画面プレビュー -->
+    <div class="ov lock" id="lockOv" aria-hidden="true" inert></div>
+    <!-- Siri プレビュー -->
+    <div class="ov siri" id="siriOv" aria-hidden="true" inert></div>
 
     <!-- ごほうび -->
     <div class="reward" id="reward" aria-hidden="true" inert>
@@ -312,6 +388,12 @@
       <button data-preview="reward"><b>🏅 ごほうび</b>1kg減のお祝い</button>
       <button data-preview="onb"><b>👋 はじめの設定</b>オンボーディングだけ見る</button>
       <button data-preview="fresh"><b>🌱 記録0件から</b>記録を消して体験（「せってい」で戻せます）</button>
+      <button data-preview="lock"><b>🔒 ロック画面</b>ウィジェットと記録ボタン</button>
+      <button data-preview="siri"><b>🎙️ Siri</b>声で記録・ショートカット</button>
+      <button data-preview="hide"><b>👀 見ないモード</b>数字をかくす／もどす</button>
+      <button data-preview="share"><b>📤 シェア</b>体重カードを画像にする</button>
+      <button data-preview="game"><b>🎯 体重よそう</b>オン／オフ（初期はオフ）</button>
+      <button data-preview="treatDemo"><b>🍰 ごほうびの日</b>あしたを宣言してみる</button>
     </div>
     <h4>もくひょう達成度でおうえんを試す</h4>
     <div class="slider">

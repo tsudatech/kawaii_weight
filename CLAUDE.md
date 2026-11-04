@@ -1,4 +1,4 @@
-# 体重きろく（Weight Buddy・kawaii_taiju_kanri）
+# たいかん！（Taikan!・kawaii_taiju_kanri）
 
 SwiftUI の iPhone アプリ ＋ ホーム画面ウィジェット（`KawaiiWidget/`）。見た目の参考元は `kawaii-weight-demo/`（HTML 版）。
 
@@ -14,7 +14,7 @@ SwiftUI の iPhone アプリ ＋ ホーム画面ウィジェット（`KawaiiWidg
   自分で足したタグは訳がないので、`L(tag)` でも書いたとおりに出る。一覧はせっていなので端末ごと（iCloud には預けない）。
 - 日付は `Fmt`（`Shared/Formatters.swift`）が言語ごとに出し分ける（10月28日（水） / Wed, Oct 28）。
 - アプリの表示名は `kawaii_taiju_kanri/{ja,en}.lproj/InfoPlist.strings`。
-  App Store の名前は「かわいい体重きろく：…」（英語は Weight Buddy: …）で、ホーム画面の表示名は「体重きろく」のまま（`体重きろく_AppStore掲載情報.md`）。
+  表示名は日本語「たいかん！」・英語「Taikan!」。アプリの中の名前は `L("たいかん！")`（`Localizable.strings`）。
 - 開発中は起動引数 `--lang en` / `--lang ja` で、端末の設定を変えずに言語を切りかえられる（デバッグビルドのみ・保存しない）。
 
 ## はじめての案内（コーチマーク）
@@ -38,9 +38,23 @@ SwiftUI の iPhone アプリ ＋ ホーム画面ウィジェット（`KawaiiWidg
     ここを外すと、起動するたびに全部の記録が「いま書きかえた」扱いになり、合わせ方が壊れる。
   - 時刻は秒で切りそろえる（保存ファイルは ISO 8601 で端数が落ちるため、そろえないと毎回ちがうと判定される）。
   - ごほうびは足し合わせ、名前はあとで変えたほう。
-- 預ける項目を足したら `BackupData`・`merge`・`WeightStore.backupData` / `applyBackup` の4か所に足すこと。
+  - ごほうびの日は `TreatMark`（`on` と変えた時刻）で、日ごとにあとで変えたほう。とりけしも消さずに `on: false` で残す。
+- 預ける項目を足したら `BackupData`（`init(from:)` も）・`merge`・`WeightStore.backupData` / `applyBackup` の4か所に足すこと。
+  `BackupData` は古い中身も読めるように `decodeIfPresent` にする（読めないと空とみなして、合わせずに上書きしてしまう）。
 - 「すべてのデータを消す」は、合わせずに iCloud 側も上書きする（`replaceRemote`。合わせるとごほうびなどが戻ってくるため）。
 - 権限は `kawaii_taiju_kanri.entitlements`（`com.apple.developer.ubiquity-kvstore-identifier`）。
+
+## 差別化の機能（デモ v0.5 から）
+
+- もどるまで見守り：`WeightStore.watches`。「飲み会」「外食」タグ、ごほうびの日とその翌朝に、その前の7日平均より 0.1kg を超えて増えた日から、平均＋0.1kg 以下にもどるまで。2週間もどらなければ静かに終わる（失敗にしない）。もどった日の顔は `judge` で「るんるん」にする（どの画面でも同じ顔にするため）。`watches` から `judge` を呼ばないこと（呼び合いになる）。
+- ごほうびの日：`WeightStore.treats`・`treatHit`（その日と翌日）。増えても `cozy` で受け止める。
+- 体重よそう（せっていでオンにした人だけ）：記録の前は `pendingGuess`、記録したら `WeightEntry.guess` / `bot` に移す。記録シートは前のよそうを残す（`WeightStore.save`）。
+- 見ないモード（`settings.hideNumbers`）：体重の数字には `.hiddenNumber()` を付ける。**数字を出す画面を足したら忘れないこと。** 数字を文に入れるときは、かくすときの文言も用意する。ウィジェットはぼかさず「••.•」に置きかえる。
+- シェア（`Views/Share/ShareCardView.swift`）：`ImageRenderer` で 1080×1350 の画像を作り、`ShareLink` で共有メニューへ。数字は「のせる」を選んだときだけ。
+- ヘルスケア（`Store/HealthSync.swift`）：**いまの提出には入れていない**（iCloud バックアップと併存すると、ガイドライン 5.1.3 に触れるおそれがあるため）。コードは `#if HEALTH_SYNC` で残してある。
+  もどすときは、コンパイル条件 `HEALTH_SYNC` を定義し、`com.apple.developer.healthkit`（entitlements）と `NSHealthShareUsageDescription` / `NSHealthUpdateUsageDescription`（pbxproj の INFOPLIST_KEY・InfoPlist.strings）を足す。紹介ページ・掲載情報・審査メモ・UI テストも直す。データは広告に渡さない。
+- ロック画面（`KawaiiWidget/LockScreenWidgets.swift`）：表情・7日平均・もくひょう％と、「体重をきろく」のコントロール（`Shared/OpenRecordIntent.swift`。アプリを開いて入力へ）。
+- Siri・ショートカット（`Intents/WeightIntents.swift`）：言いかたは `{ja,en}.lproj/AppShortcuts.strings`。アプリ名を入れた言いかたしか登録できないので「たいかん！で体重をきろく」→ 何キロかを聞く、の流れ。
 
 ## 広告（Google AdMob・`kawaii_taiju_kanri/Ads/`）
 

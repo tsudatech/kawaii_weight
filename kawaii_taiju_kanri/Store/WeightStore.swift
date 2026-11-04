@@ -15,9 +15,13 @@ enum AppTab: Hashable {
 }
 
 final class WeightStore: ObservableObject {
+    /// 画面と App Intents（Siri・ショートカット）で同じものを使う
+    static let shared = WeightStore()
+
     // MARK: - データ（変わったら保存する）
     @Published var entries: [Date: WeightEntry] = [:] {
         didSet {
+            watchesCache = nil
             stampEntries(from: oldValue)
             scheduleSave()
         }
@@ -31,6 +35,15 @@ final class WeightStore: ObservableObject {
     }
     @Published var earnedBadges: [String] = [] { didSet { scheduleSave() } }
     @Published var onboarded = false { didSet { scheduleSave() } }
+    /// ごほうびの日の印（日 → 印）
+    @Published private(set) var treats: [Date: TreatMark] = [:] {
+        didSet {
+            watchesCache = nil
+            scheduleSave()
+        }
+    }
+    /// 記録の前にしたよそう
+    @Published private(set) var pendingGuess: PendingGuess? { didSet { scheduleSave() } }
 
     // MARK: - 画面の状態
     @Published var selectedTab: AppTab = .home
@@ -43,6 +56,15 @@ final class WeightStore: ObservableObject {
     @Published var toast: String?
     @Published var showOnboarding = false
     @Published var showWidgetPreview = false
+    /// せってい › ロック画面ウィジェット・Siri のプレビュー
+    @Published var showLockPreview = false
+    @Published var showSiriPreview = false
+    /// シェアカードを作る日
+    @Published var sharingDate: Date?
+    /// ホームのキャラがその場で返すひとこと
+    @Published var heroSay: HeroSay?
+    /// もやもやがはれたときの紙ふぶき（変わるたびに出す）
+    @Published var confettiKey: Int?
     /// せってい › バックアップ
     @Published var showBackup = false
     /// せってい › タグ
@@ -72,6 +94,7 @@ final class WeightStore: ObservableObject {
     /// iCloud から届いた記録を入れている間は、書きかえた時刻を付けなおさない
     private var applyingBackup = false
     private var saveTask: Task<Void, Never>?
+    private var watchesCache: (day: Date, value: (done: [WatchRecord], active: WatchRecord?))?
 
     init() {
         // @Published の didSet は init の中でも呼ばれるので、読みこんだ記録に書きかえた時刻を付けないようにする
@@ -84,6 +107,8 @@ final class WeightStore: ObservableObject {
             onboarded = saved.onboarded
             deleted = Dictionary(saved.deleted.map { ($0.date, $0.deletedAt) }, uniquingKeysWith: { max($0, $1) })
             nameUpdatedAt = saved.nameUpdatedAt
+            treats = Dictionary(saved.treats.map { ($0.date, $0) }, uniquingKeysWith: { $0.updatedAt >= $1.updatedAt ? $0 : $1 })
+            pendingGuess = saved.pendingGuess
         }
         applyingBackup = false
         UNUserNotificationCenter.current().delegate = NotificationDelegate.shared
@@ -113,8 +138,14 @@ final class WeightStore: ObservableObject {
             earnedBadges: earnedBadges,
             onboarded: onboarded,
             deleted: deletedList,
-            nameUpdatedAt: nameUpdatedAt
+            nameUpdatedAt: nameUpdatedAt,
+            treats: treatList,
+            pendingGuess: pendingGuess
         )
+    }
+
+    private var treatList: [TreatMark] {
+        treats.values.sorted { $0.date < $1.date }
     }
 
     private var deletedList: [DeletedEntry] {
@@ -146,7 +177,8 @@ final class WeightStore: ObservableObject {
             deleted: deletedList,
             earnedBadges: Badge.all.map(\.id).filter { earnedBadges.contains($0) },
             characterName: characterName,
-            nameUpdatedAt: nameUpdatedAt
+            nameUpdatedAt: nameUpdatedAt,
+            treats: treatList
         )
     }
 
@@ -159,6 +191,7 @@ final class WeightStore: ObservableObject {
         earnedBadges = data.earnedBadges
         characterName = data.characterName
         nameUpdatedAt = data.nameUpdatedAt
+        treats = Dictionary(data.treats.map { ($0.date, $0) }, uniquingKeysWith: { $0.updatedAt >= $1.updatedAt ? $0 : $1 })
         roomMood = nil
     }
 
@@ -185,6 +218,8 @@ final class WeightStore: ObservableObject {
     /// アプリが前面に来たとき（日付が変わっているかもしれない）
     func didBecomeActive() {
         objectWillChange.send()
+        // ロック画面・コントロールセンターの「体重をきろく」から開いたら、ホームの入力へ
+        if WidgetSnapshot.consumeOpenRecord() { goToRecord() }
         guard !isScratch else { return }
         refreshOutside()
         syncRemindWithPermission()
@@ -199,6 +234,18 @@ final class WeightStore: ObservableObject {
         }
     }
 
+    /// ホームの体重入力を見せる（ほかの画面は閉じる）
+    private func goToRecord() {
+        detailDate = nil
+        showBackup = false
+        showTags = false
+        showWidgetPreview = false
+        showLockPreview = false
+        showSiriPreview = false
+        sharingDate = nil
+        selectedTab = .home
+    }
+
     /// ウィジェットと通知の予約を、いまの記録に合わせる
     private func refreshOutside() {
         let ts = todayState
@@ -211,9 +258,12 @@ final class WeightStore: ObservableObject {
             latestWeight: latestWeight,
             diff: judge(.today)?.diff,
             streak: streak,
-            recentWeights: points(lastDays: 7).map(\.weight)
+            recentWeights: points(lastDays: 7).map(\.weight),
+            average7: recentAverage,
+            goalPct: goalInfo().map { max(0, min(100, $0.pct)) },
+            hideNumbers: settings.hideNumbers
         ).save()
-        WidgetCenter.shared.reloadTimelines(ofKind: WidgetSnapshot.widgetKind)
+        WidgetCenter.shared.reloadAllTimelines()
 
         let settings = settings, name = characterName, last = sortedDates.last
         Task { await Reminder.reschedule(settings: settings, characterName: name, lastRecordDay: last) }
@@ -258,6 +308,10 @@ final class WeightStore: ObservableObject {
         settings = AppSettings()
         characterName = ""
         earnedBadges = []
+        // ほかの端末の分も消えるよう、消さずに「とりけし」の印にする
+        let now = Self.stamp()
+        treats = treats.mapValues { TreatMark(date: $0.date, on: false, updatedAt: now) }
+        pendingGuess = nil
         // iCloud に預けた分も消す（消した印つきで書きなおすので、ほかの端末の記録も消える）
         backup.replaceRemote()
         simulateAbsent = false
@@ -292,6 +346,8 @@ final class WeightStore: ObservableObject {
             w += -0.06 + (rnd() - 0.5) * 0.7
             if i == 3 || i == 2 { w += 0.35 }
             if i == 13 || i == 12 { w += 0.25 }
+            if i == 48 { w += 0.6 }     // ごほうびの日の翌朝
+            if i == 46 { w -= 0.5 }
             if skip.contains(i) { continue }
             let d = Date.today.adding(days: -i)
             let weight = (w * 10).rounded() / 10
@@ -299,11 +355,22 @@ final class WeightStore: ObservableObject {
             let t = tagged[i]
             result[d] = WeightEntry(date: d, weight: weight, fat: fat, tags: t?.0 ?? [], memo: t?.1)
         }
+        // 体重よそう：直近40日のうち、ときどき予想している（6割くらい的中）
+        let days = result.keys.sorted()
+        for (n, d) in days.enumerated() where n > 0 && d.days(to: .today) <= 40 && rnd() >= 0.15 {
+            let actual = Self.actual(from: result[days[n - 1]]?.weight ?? 0, to: result[d]?.weight ?? 0)
+            let others = WeightGuess.allCases.filter { $0 != actual }
+            result[d]?.guess = rnd() < 0.62 ? actual : others[rnd() < 0.5 ? 0 : 1]
+            result[d]?.bot = Self.botPattern(d)
+        }
         // 置きかえた本物の記録を「消した」扱いにしない（あとでバックアップをオンにしたとき、ほかの端末から消さないように）
         applyingBackup = true
         entries = result
         deleted = [:]
         applyingBackup = false
+        // 49日前に「ごほうびの日」をせんげんしていた
+        let treatDay = Date.today.adding(days: -49)
+        treats = [treatDay: TreatMark(date: treatDay, on: true, updatedAt: Self.stamp())]
         onboarded = true
         simulateAbsent = false
         earnedBadges = computeBadges()
@@ -341,6 +408,12 @@ final class WeightStore: ObservableObject {
     /// その日より前・7日以内の平均（ホームの「7日平均」・表情の判定・グラフの灰色の線で共通）
     func average7(before date: Date) -> Double? {
         let ws = sortedDates.filter { $0 < date && $0.days(to: date) <= 7 }.compactMap { entries[$0]?.weight }
+        return ws.isEmpty ? nil : ws.reduce(0, +) / Double(ws.count)
+    }
+
+    /// 直近7日（きょうをふくむ）の平均。ウィジェット・ロック画面の「7日平均」
+    var recentAverage: Double? {
+        let ws = points(lastDays: 7).map(\.weight)
         return ws.isEmpty ? nil : ws.reduce(0, +) / Double(ws.count)
     }
 
@@ -401,7 +474,17 @@ final class WeightStore: ObservableObject {
         if line == nil, entry.tags.contains("運動した") {
             line = (diff ?? 0) < 0 ? L("運動したから減ったね！えらい！") : L("運動したんだね、えらい！")
         }
-        return Judgement(mood: mood, diff: diff, line: line)
+        // ごほうびの日とその翌朝は、増えてもおちこまない
+        if let diff, diff > 0.1, treatHit(date) {
+            mood = .cozy
+            line = L("ごほうびの日、たのしかった？もどるまで見守るね")
+        }
+        // もやもやがはれた日は、どの画面でも同じ顔でよろこぶ（ホーム・きぶん・カレンダー・シェアカード）
+        if let cleared = watches.done.first(where: { $0.end == date }) {
+            mood = .happy
+            line = LF("もやもや、はれたよ！%@でもとにもどったね", LF("%d日", cleared.days))
+        }
+        return Judgement(mood: mood, diff: diff, line: line, base: base)
     }
 
     func dayFace(_ date: Date) -> DayFace? {
@@ -421,7 +504,21 @@ final class WeightStore: ObservableObject {
         if entries.isEmpty { return (.cheer, L("はじめまして！まずは、いまの体重を教えてね")) }
         let gap = absentDays
         if gap > 0 { return (.lonely, LF("%d日もどこ行ってたの…さみしかったよぉ", gap)) }
-        if let f = dayFace(.today) { return (f.mood, f.line) }
+        if let f = dayFace(.today) {
+            guard !f.picked else { return (f.mood, f.line) }
+            if clearedWatchToday != nil { return (f.mood, f.line) }
+            if settings.game, let g = guessResult(.today) {
+                if g.hit && f.mood.isSad { return (f.mood, L("ふえたけど、よそうはあたり！さすがだね")) }
+                if g.hit && !g.botHit { return (f.mood, L("よそうでぼくに勝ったね！くやし〜")) }
+            }
+            return (f.mood, f.line)
+        }
+        if settings.game {
+            if let g = todayPendingGuess {
+                return (.sleepy, LF("「%@」によそうしたね", g.guess.label))
+            }
+            return (.sleepy, L("ふえた？へった？はかる前によそうしてみて"))
+        }
         return (.sleepy, nil)
     }
 
@@ -521,23 +618,34 @@ final class WeightStore: ObservableObject {
 
     /// - Parameter memo: ホームのひとことメモ。空のときは、もとのメモをそのまま残す
     func saveToday(weight: Double, tags: [String], memo: String = "") {
+        let wasCleared = clearedWatchToday != nil
         var e = entries[.today] ?? WeightEntry(date: .today, weight: weight)
         e.weight = (weight * 10).rounded() / 10
         e.tags = tags
         let trimmed = String(memo.prefix(WeightEntry.memoLimit)).trimmingCharacters(in: .whitespacesAndNewlines)
         if !trimmed.isEmpty { e.memo = trimmed }
+        takePendingGuess(into: &e)
         entries[.today] = e
         simulateAbsent = false
         roomMood = nil
+        heroSay = nil
         homeBounce += 1
         afterChange()
+        celebrateClear(wasCleared: wasCleared)
         AdService.shared.noteSaved()
-        showToast(LF("%@kg を記録しました", Fmt.kg(e.weight)))
+        writeToHealth(e)
+        let saved = settings.hideNumbers ? L("記録しました") : LF("%@kg を記録しました", Fmt.kg(e.weight))
+        showToast(saved + guessToastSuffix)
     }
 
     func save(_ entry: WeightEntry) {
+        let wasCleared = clearedWatchToday != nil
         var e = entry
         e.weight = (e.weight * 10).rounded() / 10
+        // 記録シートは、よそうをさわらない。前のよそうをそのまま残す
+        e.guess = entries[e.date]?.guess
+        e.bot = entries[e.date]?.bot
+        if e.date == .today { takePendingGuess(into: &e) }
         entries[e.date] = e
         // 自動で決まる顔と同じなら、えらび直しとしては保存しない
         if let f = e.face, judge(e.date)?.mood == f { entries[e.date]?.face = nil }
@@ -546,8 +654,11 @@ final class WeightStore: ObservableObject {
             homeBounce += 1
         }
         roomMood = nil
+        heroSay = nil
         afterChange()
+        celebrateClear(wasCleared: wasCleared)
         AdService.shared.noteSaved()
+        writeToHealth(e)
         showToast(LF("%@を保存しました", Fmt.monthDay(e.date)))
     }
 
@@ -555,6 +666,9 @@ final class WeightStore: ObservableObject {
         entries[date] = nil
         roomMood = nil
         if detailDate == date { detailDate = nil }
+        #if HEALTH_SYNC
+        if settings.health && !isScratch { Task { await HealthSync.delete(date) } }
+        #endif
         showToast(L("記録を削除しました"))
     }
 
@@ -571,6 +685,223 @@ final class WeightStore: ObservableObject {
             if entries[d] == nil { return d }
         }
         return Date.today.adding(days: -1)
+    }
+
+    // MARK: - ごほうびの日
+
+    func isTreat(_ date: Date) -> Bool { treats[date]?.on == true }
+
+    /// ごほうびの日か、その翌日
+    func treatHit(_ date: Date) -> Bool { isTreat(date) || isTreat(date.adding(days: -1)) }
+
+    /// あしたの「ごほうびの日」をせんげんする・とりけす
+    func toggleTomorrowTreat() {
+        let tomorrow = Date.today.adding(days: 1)
+        let on = !isTreat(tomorrow)
+        treats[tomorrow] = TreatMark(date: tomorrow, on: on, updatedAt: Self.stamp())
+        heroSay = on
+            ? HeroSay(mood: .happy, line: L("わかった！あしたは思いっきりたのしんでね"))
+            : HeroSay(line: L("わかった、とりけしたよ"))
+        showToast(on ? L("あしたを ごほうびの日にしました") : L("ごほうびの日をとりけしました"))
+    }
+
+    // MARK: - 体重よそう
+
+    /// きょうのよそう（記録の前）
+    var todayPendingGuess: PendingGuess? {
+        pendingGuess?.date == .today ? pendingGuess : nil
+    }
+
+    /// よそうをえらぶ。同じものをもう一度押すと外す
+    func tapGuess(_ guess: WeightGuess) {
+        if todayPendingGuess?.guess == guess {
+            pendingGuess = nil
+            heroSay = HeroSay(mood: .sleepy, line: todayState.line ?? Mood.sleepy.lines[0])
+            return
+        }
+        let bot = todayPendingGuess?.bot ?? botGuess(.today)
+        pendingGuess = PendingGuess(date: .today, guess: guess, bot: bot)
+        heroSay = HeroSay(mood: .sleepy, line: LF("「%1$@」ね！ぼくは「%2$@」だよ", guess.label, bot.label))
+    }
+
+    private func takePendingGuess(into e: inout WeightEntry) {
+        guard let g = todayPendingGuess else { return }
+        e.guess = g.guess
+        e.bot = g.bot
+        pendingGuess = nil
+    }
+
+    /// 記録したときのトーストのうしろ
+    private var guessToastSuffix: String {
+        guard settings.game, let g = guessResult(.today) else { return "" }
+        return g.hit ? LF(" ・ よそうあたり！+%dpt", g.points) : L(" ・ よそうははずれ")
+    }
+
+    private static func actual(from previous: Double, to weight: Double) -> WeightGuess {
+        let d = ((weight - previous) * 10).rounded() / 10
+        return d > 0.1 ? .up : d < -0.1 ? .down : .same
+    }
+
+    /// 日付ごとに決まる、キャラの気まぐれ
+    private static func botPattern(_ date: Date) -> WeightGuess {
+        let c = Calendar.app.dateComponents([.year, .month, .day], from: date)
+        let key = String(format: "%04d-%02d-%02d", c.year ?? 0, c.month ?? 0, c.day ?? 0)
+        let hash = key.utf8.reduce(UInt32(7)) { $0 &* 31 &+ UInt32($1) }
+        return [WeightGuess.same, .down, .up, .same, .down][Int(hash % 5)]
+    }
+
+    /// キャラのよそう：飲み会・外食・ごほうびの日のあとは「へった」、ほかは気まぐれ
+    private func botGuess(_ date: Date) -> WeightGuess {
+        if let p = sortedDates.last(where: { $0 < date }) {
+            let tags = entries[p]?.tags ?? []
+            if tags.contains("飲み会") || tags.contains("外食") || treatHit(p) { return .down }
+        }
+        return Self.botPattern(date)
+    }
+
+    private func guessResult(for e: WeightEntry, previous: Double?) -> GuessResult? {
+        guard let guess = e.guess, let previous else { return nil }
+        let actual = Self.actual(from: previous, to: e.weight)
+        let bot = e.bot ?? botGuess(e.date)
+        let hit = guess == actual, botHit = bot == actual
+        return GuessResult(guess: guess, bot: bot, actual: actual, hit: hit, botHit: botHit,
+                           points: (hit ? 10 : 0) + (hit && !botHit ? 5 : 0))
+    }
+
+    func guessResult(_ date: Date) -> GuessResult? {
+        guard let e = entries[date] else { return nil }
+        let p = sortedDates.last { $0 < date }
+        return guessResult(for: e, previous: p.flatMap { entries[$0]?.weight })
+    }
+
+    var guessStats: GuessStats {
+        var s = GuessStats()
+        var monthCount = 0, monthHits = 0
+        let ds = sortedDates
+        let thisMonth = Calendar.app.dateComponents([.year, .month], from: .today)
+        for (i, d) in ds.enumerated() where i > 0 {
+            guard let e = entries[d], let r = guessResult(for: e, previous: entries[ds[i - 1]]?.weight) else { continue }
+            s.count += 1
+            s.points += r.points
+            s.run = r.hit ? s.run + 1 : 0
+            if r.hit && !r.botHit { s.wins += 1 }
+            if !r.hit && r.botHit { s.losses += 1 }
+            if Calendar.app.dateComponents([.year, .month], from: d) == thisMonth {
+                monthCount += 1
+                if r.hit { monthHits += 1 }
+            }
+        }
+        if monthCount > 0 { s.monthRate = Int((Double(monthHits) / Double(monthCount) * 100).rounded()) }
+        return s
+    }
+
+    // MARK: - もどるまで見守り
+
+    /// 飲み会・外食・ごほうびの日のあとに増えた日から、もとの体重（その前の7日平均）にもどるまで。
+    /// 2週間もどらなければ、失敗にせず静かに終わる
+    var watches: (done: [WatchRecord], active: WatchRecord?) {
+        // 1回の描画で何度も読むので、記録が変わるか日付が変わるまで取っておく
+        let today = Date.today
+        if let c = watchesCache, c.day == today { return c.value }
+        let value = computeWatches()
+        watchesCache = (today, value)
+        return value
+    }
+
+    private func computeWatches() -> (done: [WatchRecord], active: WatchRecord?) {
+        var done: [WatchRecord] = []
+        var cur: WatchRecord?
+        for d in sortedDates {
+            guard let e = entries[d] else { continue }
+            if var c = cur {
+                // 小数の誤差で「ちょうどもどった日」を逃さないように、ごくわずかに甘くする
+                if e.weight <= c.base + 0.1 + 0.0001 {
+                    c.end = d
+                    done.append(c)
+                    cur = nil
+                    continue
+                }
+                if c.start.days(to: d) > 14 {
+                    cur = nil
+                } else {
+                    c.current = e.weight
+                    c.peak = max(c.peak, e.weight)
+                    cur = c
+                    continue
+                }
+            }
+            let label = treatHit(d) ? "ごほうびの日" : Self.watchTags.first { e.tags.contains($0) }
+            guard let label, let avg = average7(before: d) else { continue }
+            let base = (avg * 10).rounded() / 10
+            guard ((e.weight - avg) * 10).rounded() / 10 > 0.1 else { continue }
+            cur = WatchRecord(start: d, label: label, base: base, peak: e.weight, current: e.weight)
+        }
+        if let c = cur, c.start.days(to: .today) > 14 { cur = nil }
+        return (done, cur)
+    }
+
+    private static let watchTags = ["飲み会", "外食"]
+
+    /// きょう、もどった見守り
+    var clearedWatchToday: WatchRecord? {
+        watches.done.first { $0.end == .today }
+    }
+
+    /// きょうの記録で、もやもやがはれたら紙ふぶき
+    private func celebrateClear(wasCleared: Bool) {
+        guard !wasCleared, clearedWatchToday != nil else { return }
+        Task {
+            try? await Task.sleep(for: .milliseconds(300))
+            confettiKey = (confettiKey ?? 0) + 1
+            // 降り終わったら部品ごと消す（ConfettiView は約3秒。出したままだと描きつづける）
+            let key = confettiKey
+            try? await Task.sleep(for: .seconds(3.5))
+            if confettiKey == key { confettiKey = nil }
+        }
+    }
+
+    // MARK: - ヘルスケア
+
+    #if HEALTH_SYNC
+    /// 「ヘルスケアと同期」のオン・オフ。オンにするときは許可をたずねる
+    func setHealth(_ on: Bool) {
+        guard on else {
+            settings.health = false
+            showToast(L("ヘルスケアとの同期をやめました"))
+            return
+        }
+        guard HealthSync.isAvailable else {
+            showToast(L("この端末ではヘルスケアを使えません"))
+            return
+        }
+        Task {
+            guard await HealthSync.requestAuthorization() else {
+                showToast(L("設定アプリでヘルスケアをオンにしてね"))
+                return
+            }
+            settings.health = true
+            showToast(L("ヘルスケアと同期します"))
+        }
+    }
+
+    /// ヘルスケアのいちばん新しい体重。なければトーストを出して nil
+    func readHealthWeight() async -> Double? {
+        guard let w = await HealthSync.latestWeight() else {
+            showToast(L("ヘルスケアに体重の記録がないよ"))
+            return nil
+        }
+        let v = (w * 10).rounded() / 10
+        showToast(settings.hideNumbers ? L("ヘルスケアから読みこみました") : LF("ヘルスケアから %@kg を読みこみました", Fmt.kg(v)))
+        return v
+    }
+    #endif
+
+    private func writeToHealth(_ e: WeightEntry) {
+        #if HEALTH_SYNC
+        guard settings.health, !isScratch else { return }
+        let date = e.date, weight = e.weight
+        Task { await HealthSync.write(date: date, weight: weight) }
+        #endif
     }
 
     // MARK: - タグ

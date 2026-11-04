@@ -31,24 +31,11 @@ enum Mood: String, CaseIterable, Identifiable, Codable {
         }
     }
 
-    /// 大サイズ画像（ホーム・おへや・日の詳細など）
-    var largeAsset: String {
-        switch self {
-        case .happy, .good, .hmm, .trouble, .crying, .angry, .tired: "lg_\(rawValue)"
-        case .sleepy: "yawn"
-        default: rawValue
-        }
-    }
+    /// 大サイズ画像 720×720（ホーム・おへや・日の詳細など）
+    var largeAsset: String { "lg_\(rawValue)" }
 
-    /// 小サイズ画像（りれき・カレンダー・きぶん選択など）
-    var smallAsset: String {
-        switch self {
-        case .happy: "lg_happy"
-        case .good, .hmm, .trouble, .crying, .angry, .tired: "sm_\(rawValue)"
-        case .sleepy: "sm_sleepy"
-        default: rawValue
-        }
-    }
+    /// 小サイズ画像 240×240、頭と肩まで（りれき・カレンダー・きぶん選択など）
+    var smallAsset: String { "sm_\(rawValue)" }
 
     var lines: [String] {
         switch self {

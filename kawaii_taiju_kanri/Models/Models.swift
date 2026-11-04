@@ -20,12 +20,97 @@ struct WeightEntry: Identifiable, Equatable, Codable {
     var face: Mood?
     /// 最後に書きかえた時刻（iCloud バックアップで、どちらの端末の記録を残すか決めるのに使う）
     var updatedAt: Date?
+    /// 体重よそう：はかる前の予想と、そのときのキャラの予想
+    var guess: WeightGuess?
+    var bot: WeightGuess?
 }
 
 /// 消した記録の印（iCloud バックアップで、ほかの端末に残っている同じ日の記録も消すため）
 struct DeletedEntry: Codable, Equatable {
     let date: Date
     let deletedAt: Date
+}
+
+/// ごほうびの日の印。とりけしも iCloud でほかの端末に伝わるよう、消さずに on を切る
+struct TreatMark: Codable, Equatable {
+    let date: Date
+    var on: Bool
+    var updatedAt: Date
+}
+
+/// 体重よそうの3択（まえの記録より。±0.1kg までは「おなじ」）
+enum WeightGuess: String, CaseIterable, Codable {
+    case up, same, down
+
+    var label: String {
+        switch self {
+        case .up: L("ふえた")
+        case .same: L("おなじ")
+        case .down: L("へった")
+        }
+    }
+
+    var arrow: String {
+        switch self {
+        case .up: "↑"
+        case .same: "→"
+        case .down: "↓"
+        }
+    }
+}
+
+/// 記録の前にしたよそう（きょうの記録ができたら、その日の記録に移す）
+struct PendingGuess: Codable, Equatable {
+    let date: Date
+    var guess: WeightGuess
+    var bot: WeightGuess
+}
+
+/// その日のよそうの結果
+struct GuessResult {
+    var guess: WeightGuess
+    var bot: WeightGuess
+    var actual: WeightGuess
+    var hit: Bool
+    var botHit: Bool
+    var points: Int
+}
+
+/// 体重よそうの成績
+struct GuessStats {
+    var points = 0
+    var count = 0
+    var wins = 0
+    var losses = 0
+    /// こんげつの的中率（まだよそうしていなければ nil）
+    var monthRate: Int?
+    var run = 0
+    var level: Int { points / 100 + 1 }
+    var inLevel: Int { points % 100 }
+    var title: String { GuessTitle.all[min(level - 1, GuessTitle.all.count - 1)] }
+}
+
+enum GuessTitle {
+    static let all = [L("よそう見習い"), L("よそう上手"), L("よそう名人"), L("よそう博士"), L("よそうの神さま")]
+}
+
+/// もどるまで見守り：増えた日から、もとの体重（その前の7日平均）にもどるまで
+struct WatchRecord: Equatable {
+    let start: Date
+    /// 日本語のキー（飲み会・外食・ごほうびの日）。出すときに L(label) で訳す
+    let label: String
+    let base: Double
+    var peak: Double
+    var current: Double
+    /// もどった日（見守り中は nil）
+    var end: Date?
+    var days: Int { end.map { start.days(to: $0) } ?? 0 }
+}
+
+/// ホームのキャラが、その場で返すひとこと（よそう・ごほうびの日を押したとき）
+struct HeroSay: Equatable {
+    var mood: Mood?
+    var line: String
 }
 
 /// 日のタグ。保存するのは日本語のまま（キー）で、表示するときに L(tag) で訳す
@@ -63,6 +148,12 @@ struct AppSettings: Equatable, Codable {
     var judge: JudgeMode = .trend
     /// 「きょうのこと」に出すタグ（せってい › タグ で足したり消したりする）。はじめは DayTag.all
     var tags: [String] = DayTag.all
+    /// 見ないモード：体重の数字をかくして、ことばで伝える
+    var hideNumbers = false
+    /// ヘルスケアと同期。許可をもらうまでは切っておく
+    var health = false
+    /// 体重よそう（せっていでオンにした人だけ）
+    var game = false
 }
 
 // あとから項目が増えても、古い保存データを読めるようにする
@@ -79,6 +170,9 @@ extension AppSettings {
         strict = try c.decodeIfPresent(Bool.self, forKey: .strict) ?? d.strict
         judge = try c.decodeIfPresent(JudgeMode.self, forKey: .judge) ?? d.judge
         tags = try c.decodeIfPresent([String].self, forKey: .tags) ?? d.tags
+        hideNumbers = try c.decodeIfPresent(Bool.self, forKey: .hideNumbers) ?? d.hideNumbers
+        health = try c.decodeIfPresent(Bool.self, forKey: .health) ?? d.health
+        game = try c.decodeIfPresent(Bool.self, forKey: .game) ?? d.game
     }
 }
 
@@ -118,11 +212,11 @@ struct CheerBand {
     static let all: [CheerBand] = [
         CheerBand(upTo: 0, face: "lg_hmm", lines: [L("ここがスタートライン！いっしょにいこ"), L("あせらず、まずは毎日はかろうね")]),
         CheerBand(upTo: 10, face: "lg_good", lines: [L("いいスタート！最初の一歩がいちばんえらい"), L("はじめたこと自体がすごいんだよ")]),
-        CheerBand(upTo: 25, face: "cheer", lines: [L("もう{p}%進んだよ！ちゃんと前に進んでる"), L("コツコツがちゃんと数字に出てるね")]),
-        CheerBand(upTo: 50, face: "cheer", lines: [L("4分の1こえたね！このままいこ〜"), L("半分まで、あと{toHalf}kgだよ！")]),
+        CheerBand(upTo: 25, face: "lg_cheer", lines: [L("もう{p}%進んだよ！ちゃんと前に進んでる"), L("コツコツがちゃんと数字に出てるね")]),
+        CheerBand(upTo: 50, face: "lg_cheer", lines: [L("4分の1こえたね！このままいこ〜"), L("半分まで、あと{toHalf}kgだよ！")]),
         CheerBand(upTo: 75, face: "lg_happy", lines: [L("もう半分こえた！折り返しだよ〜"), L("ここまで来たの、ほんとにすごい")]),
-        CheerBand(upTo: 90, face: "cheer", lines: [L("ゴールが見えてきた！あと{left}kg"), L("いっしょにゴールテープ切ろうね")]),
-        CheerBand(upTo: 100, face: "cheer", lines: [L("あとちょっと！ラストスパート！"), L("あと{left}kg…どきどきしてきた！")]),
+        CheerBand(upTo: 90, face: "lg_cheer", lines: [L("ゴールが見えてきた！あと{left}kg"), L("いっしょにゴールテープ切ろうね")]),
+        CheerBand(upTo: 100, face: "lg_cheer", lines: [L("あとちょっと！ラストスパート！"), L("あと{left}kg…どきどきしてきた！")]),
         CheerBand(upTo: .infinity, face: "lg_happy", lines: [L("もくひょう達成おめでとう！これからはキープしよ"), L("ほんとにがんばったね。ずっと見てたよ")]),
     ]
 }
@@ -132,6 +226,8 @@ struct Judgement {
     var mood: Mood
     var diff: Double?
     var line: String?
+    /// くらべた体重（7日平均または前回の記録）
+    var base: Double?
 }
 
 /// その日の顔（えらび直した顔があればそれ、なければ自動）

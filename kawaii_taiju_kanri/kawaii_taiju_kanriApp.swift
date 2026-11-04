@@ -10,7 +10,7 @@ import SwiftUI
 
 @main
 struct kawaii_taiju_kanriApp: App {
-    @StateObject private var store = WeightStore()
+    @StateObject private var store = WeightStore.shared
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {

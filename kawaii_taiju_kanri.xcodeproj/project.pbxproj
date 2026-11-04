@@ -456,8 +456,9 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "体重きろく";
+				INFOPLIST_KEY_CFBundleDisplayName = "たいかん！";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "シェア用の体重カードを写真に保存するために使います。";
 				INFOPLIST_KEY_NSUserTrackingUsageDescription = "あなたに合った広告を表示するために使います。体重の記録は使いません。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -493,8 +494,9 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "体重きろく";
+				INFOPLIST_KEY_CFBundleDisplayName = "たいかん！";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "シェア用の体重カードを写真に保存するために使います。";
 				INFOPLIST_KEY_NSUserTrackingUsageDescription = "あなたに合った広告を表示するために使います。体重の記録は使いません。";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -527,7 +529,7 @@
 				DEVELOPMENT_TEAM = TGF4E76D8F;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = KawaiiWidget/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "体重きろく";
+				INFOPLIST_KEY_CFBundleDisplayName = "たいかん！";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -556,7 +558,7 @@
 				DEVELOPMENT_TEAM = TGF4E76D8F;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = KawaiiWidget/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "体重きろく";
+				INFOPLIST_KEY_CFBundleDisplayName = "たいかん！";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

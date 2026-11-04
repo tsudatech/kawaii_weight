@@ -33,14 +33,14 @@ struct WidgetPreviewView: View {
                     HStack(alignment: .top, spacing: gridGap) {
                         appIcon(L("カメラ"), col)
                         appIcon(L("天気"), col)
-                        label(L("体重きろく（小）"))
+                        label(L("たいかん！（小）"))
                             .frame(width: col * 2 + gridGap)
                             .offset(y: -12)
                     }
                     Color.clear.frame(height: 0)
                     mediumWidget(mood: ts.mood, line: ts.line ?? ts.mood.lines[0])
                         .frame(height: geo.size.width / 2.15)
-                    label(L("体重きろく（中）"))
+                    label(L("たいかん！（中）"))
                         .frame(maxWidth: .infinity)
                         .padding(.top, -12)
                     HStack(alignment: .top, spacing: gridGap) {
@@ -53,7 +53,7 @@ struct WidgetPreviewView: View {
                                 .background(RoundedRectangle(cornerRadius: 15).fill(LinearGradient(colors: [Palette.faceBG, Palette.cheek], startPoint: UnitPoint(x: 0.35, y: 0), endPoint: UnitPoint(x: 0.65, y: 1))))
                                 .clipShape(RoundedRectangle(cornerRadius: 15))
                                 .shadow(color: Palette.ink.opacity(0.4), radius: 5, y: 4)
-                            label(L("体重きろく"))
+                            label(L("たいかん！"))
                         }
                         .frame(width: col)
                         appIcon(L("ミュージック"), col)
@@ -62,7 +62,7 @@ struct WidgetPreviewView: View {
             }
             // .sbNote
             HStack(spacing: 10) {
-                Text(L("ホーム画面の何もないところを長押し →「編集」→「ウィジェットを追加」から「体重きろく」をえらんでね"))
+                Text(L("ホーム画面の何もないところを長押し →「編集」→「ウィジェットを追加」から「たいかん！」をえらんでね"))
                     .font(.ui(12))
                     .lineHeight(1.6, size: 12)
                     .foregroundStyle(.white)
@@ -137,8 +137,10 @@ struct WidgetPreviewView: View {
                 Text(store.isTodayRecorded ? L("きょう") : L("さいしん")).font(.ui(10)).foregroundStyle(Palette.inkSoft)
                 Text("\(Text(store.latestWeight.map { Fmt.kg($0) } ?? "—").font(.num(26)))\(Text("kg").font(.num(12)))")
                     .numLineHeight(1, size: 26)
+                    .hiddenNumber()
                 Text(num: j?.diff.map { "\(Fmt.signed($0))kg" } ?? (store.isTodayRecorded ? "—" : L("まだはかってないよ")), size: 12, weight: .bold)
                     .foregroundStyle(deltaColor(j?.diff))
+                    .hiddenNumber()
             }
         }
     }
@@ -154,6 +156,7 @@ struct WidgetPreviewView: View {
                     Text(LF("%1$@「%2$@」", name, String(line.prefix(16)))).font(.ui(10)).foregroundStyle(Palette.inkSoft).lineLimit(1)
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
                         Text("\(Text(store.latestWeight.map { Fmt.kg($0) } ?? "—").font(.num(26)))\(Text("kg").font(.num(12)))")
+                            .hiddenNumber()
                         Text(num: "🔥" + LF("%d日", store.streak), size: 12, weight: .bold)
                     }
                     .numLineHeight(1, size: 26)

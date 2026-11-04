@@ -22,9 +22,16 @@ struct WidgetSnapshot: Codable {
     var streak: Int
     /// 直近7日の体重（グラフ用）
     var recentWeights: [Double]
+    /// 直近7日の平均（ロック画面）
+    var average7: Double?
+    /// もくひょうの達成度 0〜100（ロック画面）
+    var goalPct: Double?
+    /// 見ないモード（体重の数字を出さない）
+    var hideNumbers: Bool?
 
-    static let appGroup = "group.jp.jntech.kawaii-taiju-kanri"
+    nonisolated static let appGroup = "group.jp.jntech.kawaii-taiju-kanri"
     static let widgetKind = "KawaiiWeightWidget"
+    nonisolated private static let openRecordKey = "openRecord"
 
     private static var fileURL: URL? {
         FileManager.default
@@ -40,6 +47,19 @@ struct WidgetSnapshot: Codable {
     func save() {
         guard let url = Self.fileURL, let data = try? JSONEncoder().encode(self) else { return }
         try? data.write(to: url, options: .atomic)
+    }
+
+    // MARK: - 「体重をきろく」から開いたとき
+
+    /// コントロールの Intent はウィジェット側で動くことがあるので、共有の場所に印を置いて、アプリが受け取る
+    nonisolated static func requestOpenRecord() {
+        UserDefaults(suiteName: appGroup)?.set(true, forKey: openRecordKey)
+    }
+
+    nonisolated static func consumeOpenRecord() -> Bool {
+        guard let d = UserDefaults(suiteName: appGroup), d.bool(forKey: openRecordKey) else { return false }
+        d.removeObject(forKey: openRecordKey)
+        return true
     }
 
     // MARK: - 表示する日の状態（書き出した日から日付が変わっていても正しく見せる）

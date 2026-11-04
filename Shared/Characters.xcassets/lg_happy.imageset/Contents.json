@@ -1,5 +1,12 @@
 {
-  "images" : [ { "filename" : "lg_happy.svg", "idiom" : "universal" } ],
-  "info" : { "author" : "xcode", "version" : 1 },
-  "properties" : { "preserves-vector-representation" : true }
+  "images": [
+    {
+      "filename": "lg_happy.png",
+      "idiom": "universal"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  }
 }

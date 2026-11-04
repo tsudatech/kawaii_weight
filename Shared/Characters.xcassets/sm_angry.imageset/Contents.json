@@ -1,5 +1,12 @@
 {
-  "images" : [ { "filename" : "sm_angry.svg", "idiom" : "universal" } ],
-  "info" : { "author" : "xcode", "version" : 1 },
-  "properties" : { "preserves-vector-representation" : true }
+  "images": [
+    {
+      "filename": "sm_angry.png",
+      "idiom": "universal"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  }
 }

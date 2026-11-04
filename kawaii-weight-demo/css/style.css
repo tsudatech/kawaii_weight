@@ -28,6 +28,7 @@ body{background:var(--desk);color:var(--ink);font-family:var(--font-ui);
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
   -webkit-tap-highlight-color:transparent}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--rose);outline-offset:2px}
 
@@ -107,6 +108,128 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px soli
 .hs b{font-family:var(--font-num);font-size:21px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.3}
 .hs small{font-size:11px;font-weight:700;margin-left:1px}
 .down{color:var(--mint-ink)}.up{color:var(--up)}
+
+
+/* ---------- 体重よそう ---------- */
+.guess{background:var(--blush);border-radius:18px;padding:6px 6px 6px 12px;margin-bottom:10px;display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:center}
+.gHead{display:flex;flex-direction:column;font-size:13px;font-weight:900;line-height:1.25}
+.gHead small{font-size:10px;color:var(--ink-soft);font-weight:700;white-space:nowrap}
+.gBtns{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.gBtns button{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:6px 2px;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:2px;position:relative;transition:.15s;white-space:nowrap}
+.gBtns button b{font-family:var(--font-num);font-size:15px;line-height:1}
+.gBtns button[aria-pressed="true"]{background:var(--cheek);border-color:var(--ink)}
+.gBtns .botMk{position:absolute;top:-9px;right:-4px;background:var(--mint-ink);color:#fff;font-size:9px;border-radius:6px;padding:0 5px;font-weight:900;line-height:1.6}
+.gBot{display:none}
+#recCard .chips{gap:4px;flex-wrap:nowrap}
+#recCard .chip{padding:4px 8px;font-size:11px;white-space:nowrap}
+.gRes{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}
+.gStamp{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:13px;line-height:1.1;text-align:center;background:var(--rose);color:#fff;transform:rotate(-8deg);box-shadow:0 0 0 3px #fff,0 0 0 5px var(--rose)}
+.gStamp.miss{background:#F6EEE7;color:var(--ink-soft);box-shadow:0 0 0 3px #fff,0 0 0 5px #EADDD1}
+.gTxt{min-width:0}
+.gTxt b{display:block;font-size:14px;font-weight:900;line-height:1.45}
+.gTxt small{display:block;font-size:11px;color:var(--ink-soft);font-weight:700;line-height:1.5}
+.gPts{font-family:var(--font-num);font-size:22px;font-weight:800;color:var(--rose);white-space:nowrap}
+.gFoot{display:flex;gap:6px;margin-top:12px}
+.gFoot span{flex:1;background:var(--paper);border-radius:14px;padding:6px 4px;text-align:center;font-size:10px;font-weight:700;color:var(--ink-soft);min-width:0}
+.gFoot b{display:block;font-family:var(--font-num);font-size:16px;color:var(--ink);line-height:1.25}
+/* ---------- もどるまで見守り ---------- */
+.watch{background:linear-gradient(180deg,#EAF5F7,#FFFFFF 80%);border-color:#D5EAEC}
+.watch.clear{background:linear-gradient(180deg,#FFF6DC,#FFFFFF 80%);border-color:#F6E3B5}
+.wRow{display:grid;grid-template-columns:86px 1fr;gap:10px;align-items:center}
+.cloud{width:86px;height:60px;display:grid;place-items:center}
+.cloud svg{width:100%;height:100%;transition:transform .5s;transform-origin:50% 60%}
+.wTxt{min-width:0}
+.wTxt b{font-size:14px;font-weight:900;display:block}
+.wTxt small{font-size:11px;color:var(--ink-soft);font-weight:700;display:block;line-height:1.55}
+.wBar{height:10px;border-radius:999px;background:#E3EEF0;margin-top:10px;overflow:hidden}
+.wBar i{display:block;height:100%;background:linear-gradient(90deg,var(--sky),var(--mint-ink));border-radius:999px;transition:width .6s}
+.watch.clear .wBar i{background:linear-gradient(90deg,var(--gold),#E9A94F)}
+.clList{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.clList li{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;font-weight:700;background:var(--paper);border-radius:12px;padding:7px 10px}
+.clList li b{font-family:var(--font-num);font-size:14px;color:var(--mint-ink);white-space:nowrap}
+.clList li.now b{color:#6E9AA3}
+/* ---------- ごほうびの日 ---------- */
+.treat{display:flex;align-items:center;gap:10px;padding:12px 14px}
+.treat .ti{width:40px;height:40px;border-radius:14px;background:#FFF3D9;display:grid;place-items:center;flex:none}
+.treat .tt{flex:1;min-width:0;font-size:11px;font-weight:700;color:var(--ink-soft);line-height:1.5}
+.treat .tt b{display:block;color:var(--ink);font-size:14px;font-weight:900}
+.treat button{background:var(--ink);color:#FFF6EE;border-radius:999px;padding:7px 12px;font-size:12px;font-weight:900;white-space:nowrap}
+.treat.on{background:#FFF8EC;border-color:var(--gold)}
+.treat.on button{background:var(--card);color:var(--ink);border:2px solid var(--line)}
+.cal .cell .cake{position:absolute;top:2px;left:3px;font-size:9px;line-height:1}
+.dGuess{margin:8px 0 0!important;font-size:12px!important;color:var(--ink-soft)}
+/* ---------- ヘルスケア ---------- */
+.hkBtn{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:900;color:#D9534F;background:#FDECEC;border-radius:999px;padding:3px 9px;white-space:nowrap}
+.hkBtn svg{width:12px;height:12px}
+/* ---------- 見ないモード：体重の数字をぼかす ---------- */
+.phone.hideNum .nv,.phone.hideNum .nvb b,.phone.hideNum .stat b,.phone.hideNum .hist .w,.phone.hideNum .cal .cell .w,.phone.hideNum .wdg .wn,.phone.hideNum .wdg .wd{filter:blur(7px);user-select:none}
+.phone.hideNum .chart text.yl{display:none}
+.phone.hideNum #wInput{-webkit-text-security:disc}
+.phone.hideNum #dW{font-family:var(--font-ui);font-size:24px;font-weight:900}
+.phone.hideNum .doneInfo .big small{display:none}
+.hideBadge{display:none;font-size:10px;font-weight:900;background:var(--ink);color:#FFF6EE;border-radius:999px;padding:2px 8px;margin-left:6px;vertical-align:4px}
+.phone.hideNum .hideBadge{display:inline-block}
+/* ---------- ロック画面・Siri プレビュー ---------- */
+.ov{position:absolute;inset:0;z-index:12;opacity:0;pointer-events:none;transform:scale(1.04);transition:opacity .3s,transform .3s;display:flex;flex-direction:column}
+.ov.open{opacity:1;pointer-events:auto;transform:none}
+.lock{background:linear-gradient(170deg,#3B2B25 0%,#6E4C40 50%,#C9918A 100%);color:#fff;padding:62px 22px 30px;align-items:center}
+.lkDate{font-size:17px;font-weight:700;opacity:.92}
+.lkTime{font-family:system-ui,sans-serif;font-size:90px;font-weight:700;line-height:1;letter-spacing:-2px;margin:0 0 14px}
+.lkInline{font-size:13px;font-weight:700;opacity:.9;margin-bottom:2px}
+.lkW{display:flex;gap:10px;width:100%;justify-content:center;align-items:stretch}
+.lkC{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;flex:none;position:relative}
+.lkC .f{width:52px;height:52px;border-radius:50%;background:#FFF6EE;display:grid;place-items:center;overflow:hidden}
+.lkC .f svg{width:46px;height:46px}
+.lkC .ring{position:absolute;inset:4px}
+.lkC .rt{font-family:var(--font-num);font-size:17px;font-weight:800;line-height:1;text-align:center}
+.lkC .rt small{display:block;font-family:var(--font-ui);font-size:8px;font-weight:700;opacity:.85}
+.lkR{flex:0 1 150px;border-radius:20px;background:rgba(255,255,255,.2);padding:8px 12px;display:flex;flex-direction:column;justify-content:center;line-height:1.25;min-width:0}
+.lkR small{font-size:10px;font-weight:700;opacity:.85}
+.lkR b{font-family:var(--font-num);font-size:24px;font-weight:800}
+.lkR b small{font-size:11px}
+.lkCtl{margin-top:auto;display:flex;justify-content:space-between;width:100%;padding:0 26px 10px}
+.lkCtl span{width:52px;height:52px;border-radius:50%;background:rgba(30,20,16,.45);display:grid;place-items:center;font-size:20px;position:relative}
+.lkCtl .rec svg{width:40px;height:40px}
+.lkCtl .rec i{position:absolute;bottom:-18px;font-style:normal;font-size:10px;font-weight:700;white-space:nowrap}
+.lock .sbNote{margin-top:26px;width:100%}
+.siri{background:rgba(40,28,22,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:70px 14px 30px;justify-content:flex-end;color:#fff}
+.siriSay{font-size:21px;font-weight:700;text-align:center;line-height:1.45;margin:0 10px 16px}
+.siriSay small{display:block;font-size:12px;opacity:.75;font-weight:700}
+.siriCard{background:rgba(255,250,246,.97);border-radius:26px;padding:12px 14px;display:grid;grid-template-columns:76px 1fr;gap:10px;align-items:center;color:var(--ink)}
+.siriCard .f{width:76px;height:76px}
+.siriCard .f svg{width:100%;height:100%}
+.siriCard b{display:block;font-size:16px;font-weight:900}
+.siriCard small{display:block;font-size:12px;font-weight:700;color:var(--ink-soft);line-height:1.5}
+.siriCard .ap{font-size:10px;color:var(--ink-soft);font-weight:700}
+.siriList{background:rgba(255,250,246,.93);border-radius:22px;padding:12px 14px;margin-top:10px;color:var(--ink)}
+.siriList h4{margin:0 0 6px;font-size:12px;font-weight:900;color:var(--ink-soft)}
+.siriList ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px}
+.siriList li{font-size:13px;font-weight:700;background:#fff;border-radius:12px;padding:6px 10px}
+.siriList .sc{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.siriList .sc span{background:linear-gradient(135deg,#E58C86,#F3CA89);color:#fff;border-radius:14px;padding:8px 10px;font-size:12px;font-weight:900;line-height:1.3}
+.siriList .sc span small{display:block;font-size:10px;opacity:.9}
+.siriGlow{height:8px;border-radius:999px;background:linear-gradient(90deg,#F9D2CC,#E58C86,#B4E1E4,#F3CA89,#F9D2CC);margin:14px 20px 0;filter:blur(2px)}
+.siri .sbNote{margin-top:12px}
+
+/* ---------- シェア ---------- */
+.doneLinks{display:flex;gap:12px;align-items:center}
+.shareBtn{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:900;color:#FFF6EE;background:var(--rose);border-radius:999px;padding:5px 11px 5px 9px;margin-top:4px}
+.shareBtn svg{width:14px;height:14px}
+.dShare{display:inline-flex;align-items:center;gap:4px;margin-top:10px;font-size:12px;font-weight:900;color:var(--rose);background:var(--card);border:2px solid var(--cheek);border-radius:999px;padding:5px 12px}
+.dShare svg{width:14px;height:14px}
+#shareSheet{z-index:14}
+#shareBack{z-index:13}
+.shPrev{display:flex;justify-content:center;margin-top:6px}
+.shPrev canvas{width:auto;height:330px;max-width:100%;aspect-ratio:4/5;border-radius:18px;box-shadow:0 10px 26px -12px rgba(74,48,32,.45);background:var(--blush)}
+.shOpts{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.shOpts .line{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px;font-weight:900}
+.swatches{display:flex;gap:8px}
+.swatches button{width:30px;height:30px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px var(--line)}
+.swatches button[aria-pressed="true"]{box-shadow:0 0 0 2.5px var(--ink)}
+.shTargets{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:16px}
+.shTargets button{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--ink-soft)}
+.shTargets i{width:50px;height:50px;border-radius:14px;display:grid;place-items:center;font-style:normal;font-weight:900;font-size:13px;color:#fff}
+.shNote{font-size:11px;font-weight:700;color:var(--ink-soft);text-align:center;margin-top:10px;line-height:1.6}
 
 /* ---------- cards ---------- */
 .card{background:var(--card);border:2px solid var(--line);border-radius:28px;padding:16px;margin-top:14px}
@@ -188,7 +311,7 @@ svg.chart text{font-family:var(--font-num);font-size:11px;fill:var(--ink-soft);f
 /* ---------- graph screen ---------- */
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
 .stat{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:12px 14px}
-.stat span{display:block;font-size:11px;font-weight:700;color:var(--ink-soft);letter-spacing:.06em}
+.stat > span{display:block;font-size:11px;font-weight:700;color:var(--ink-soft);letter-spacing:.06em}
 .stat b{font-family:var(--font-num);font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.25}
 .stat small{font-size:12px;font-weight:700;margin-left:2px}
 .stat em{display:block;font-style:normal;font-size:11px;color:var(--ink-soft);font-weight:700}

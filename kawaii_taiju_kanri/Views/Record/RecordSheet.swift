@@ -208,6 +208,7 @@ struct RecordSheet: View {
                     .accessibilityLabel(L("0.1% 減らす"))
                 Text("\(Text(Fmt.kg(fat)).font(.num(28)))\(Text("%").font(.num(14)))")
                     .foregroundStyle(Palette.ink)
+                    .hiddenNumber()
                     .frame(maxWidth: .infinity)
                 RoundStepButton.mini("+") { fat = min(70, ((fat + 0.1) * 10).rounded() / 10) }
                     .accessibilityLabel(L("0.1% 増やす"))

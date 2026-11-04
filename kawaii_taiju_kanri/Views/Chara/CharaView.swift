@@ -21,6 +21,8 @@ struct CharaView: View {
             }
             room.coachTarget("chara.room")
             levelCard.coachTarget("chara.level").padding(.top, 14)
+            if store.settings.game { guessCard.padding(.top, 14) }
+            clearedCard.padding(.top, 14)
             badgeCard.padding(.top, 14)
             dexCard.padding(.top, 14)
         }
@@ -115,6 +117,66 @@ struct CharaView: View {
             Hint(L("毎日きろくすると、なかよし度が上がるよ"))
         }
         .card()
+    }
+
+    // MARK: - 体重よそう（#gmCard）
+
+    private var guessCard: some View {
+        let s = store.guessStats
+        return VStack(alignment: .leading, spacing: 0) {
+            CardTitle(L("体重よそう"), note: "\(s.points)pt")
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Text("Lv.\(s.level)").font(.num(30)).foregroundStyle(Palette.rose).numLineHeight(1, size: 30)
+                Text(s.title).font(.ui(14)).foregroundStyle(Palette.ink)
+            }
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule().fill(Palette.seg)
+                    StripeFill()
+                        .frame(width: geo.size.width * Double(s.inLevel) / 100)
+                        .clipShape(Capsule())
+                }
+            }
+            .frame(height: 14)
+            .clipShape(Capsule())
+            .padding(.top, 10)
+            GuessFooter(stats: s).padding(.top, 12)
+            Hint(L("はかる前に、まえの記録より「ふえた・おなじ・へった」を当てるゲーム。±0.1kg までは「おなじ」。あたると 10pt、キャラとちがうよそうで当てると +5pt"))
+        }
+        .card()
+    }
+
+    // MARK: - はらした もやもや
+
+    private var clearedCard: some View {
+        let w = store.watches
+        let recent = Array(w.done.reversed().prefix(5))
+        return VStack(alignment: .leading, spacing: 0) {
+            CardTitle(L("はらした もやもや"), note: w.done.isEmpty ? "" : LF("%1$dこ・さいそく %2$@", w.done.count, LF("%d日", w.done.map(\.days).min() ?? 0)))
+            VStack(spacing: 6) {
+                if let a = w.active {
+                    clearedRow("\(Fmt.slash(a.start)) \(L(a.label))", L("見守り中"), color: Color(hex: 0x6E9AA3))
+                }
+                ForEach(recent, id: \.start) { r in
+                    clearedRow("\(Fmt.slash(r.start)) \(L(r.label))", LF("%@ではれた", LF("%d日", r.days)), color: Palette.mintInk)
+                }
+                if w.active == nil && recent.isEmpty {
+                    clearedRow(L("まだないよ"), "—", color: Palette.mintInk)
+                }
+            }
+            Hint(L("飲み会・外食・ごほうびの日のあとに増えてから、もとの体重にもどるまでの日数だよ"))
+        }
+        .card()
+    }
+
+    private func clearedRow(_ label: String, _ value: String, color: Color) -> some View {
+        HStack(spacing: 8) {
+            Text(label).font(.ui(12)).foregroundStyle(Palette.ink).lineLimit(1)
+            Spacer(minLength: 0)
+            Text(num: value, size: 14, weight: .heavy).foregroundStyle(color).lineLimit(1)
+        }
+        .padding(.vertical, 7).padding(.horizontal, 10)
+        .background(RoundedRectangle(cornerRadius: 12).fill(Palette.paper))
     }
 
     // MARK: - ごほうび

@@ -5,17 +5,19 @@
 //  App Review に出す画面収録用に、アプリの使い方を最初から最後まで自動で通すテスト。
 //  （審査対応メモ「体重きろく_審査対応.md」§2-2 の流れ。スラッシュの ReviewWalkthroughTests と同じ作り）
 //
-//  流れ
+//  流れ（審査に必要な最低限。約3分）
 //  ホーム画面からアイコンで起動 → はじめの設定（通知の許可）→ ホームの案内 → トラッキング許可（ATT）
-//  → 過去の日を記録（記録シート）→ きょうを記録してキャラが反応 → きょうのきぶん
-//  → グラフ（期間・カレンダー・日の詳細）→ キャラ（名前・ずかん・ごほうび）
-//  → せってい（通知をためす・ウィジェット・バックアップ・CSV）→ ホーム
+//  → 過去の2日を記録（飲み会で増えて「もどるまで見守り」が出る）
+//  → せってい（見ないモード）→ グラフ（カレンダー・日の詳細）→ キャラ
+//  → ホーム：きょうを記録して、もやもやがはれる（紙ふぶき）→ ごほうびの日せんげん → シェアカード
 //
-//  記録は2回だけ（全画面広告は3回記録したあとに出る作りなので、収録の途中で出ないように）。
+//  記録は3回で、3回目は最後にする。全画面広告は3回記録したあとのタブ切りかえで出る作りなので、
+//  3回目のあとはタブを切りかえない（収録の途中で広告が出ないように）。
 //
 //  使い方
 //  1. iPhone を Mac につなぎ、ロックを解除しておく
-//  2. アプリを削除しておく（はじめの設定と各タブの案内、許可のダイアログから撮るため。削除すると記録は消える）
+//  2. アプリを削除して、入れ直しておく。開かないこと（はじめの設定と各タブの案内、許可のダイアログから撮るため。削除すると記録は消える）。
+//     入っていない状態から実行すると、アイコンがまだなくてタップできず、アイコンを使わない起動になってしまう
 //  3. テスト用のアプリ（kawaii_taiju_kanriUITests-Runner）が収録に映らないよう、ホーム画面の別のページに移しておく
 //  4. 画面収録を始めてから、このテストを実行する（くわしくは審査対応メモ §2-4）
 //     xcodebuild test -project kawaii_taiju_kanri.xcodeproj -scheme kawaii_taiju_kanri -configuration Release -parallel-testing-enabled NO \
@@ -38,128 +40,123 @@ final class ReviewWalkthroughTests: XCTestCase {
 
     func testReviewWalkthrough() {
         launchFromHomeScreen()
-        wait(2)
+        wait(1.5)
 
         // はじめの設定（あいさつ → からだ → おしらせ → じゅんび完了）
         if tapButton(["はじめる", "Get started"], timeout: 8, overTabBar: true) {
-            wait(2)
-            // 身長・もくひょう体重：もくひょうを少し下げてみせる
-            let minus = app.buttons.matching(NSPredicate(format: "label == %@", "−"))
-            if minus.count >= 2 {
-                safeTap(minus.element(boundBy: 1), overTabBar: true); wait(0.6)
-                safeTap(minus.element(boundBy: 1), overTabBar: true); wait(1.2)
-            }
-            tapButton(["つぎへ", "Next"], overTabBar: true); wait(2.2)
-            // おしらせ → 通知の許可（許可する）
+            wait(1)
+            tapButton(["つぎへ", "Next"], overTabBar: true); wait(1)
             tapButton(["おしらせをうけとる", "Turn on reminders"], overTabBar: true)
             answerAlert(allow: true, timeout: 6)
-            wait(2)
-            tapButton(["きょうの体重をきろくする", "Log today’s weight"], overTabBar: true); wait(2)
+            wait(1)
+            tapButton(["きょうの体重をきろくする", "Log today’s weight"], overTabBar: true); wait(1)
         }
 
         // ホームの案内 → トラッキング許可（案内が終わってから出る）
         passCoachMarks()
         answerAlert(allow: false, timeout: 10)
-        wait(2)
-
-        // 過去の日を記録（記録シート：日付・体重・体脂肪率・タグ・メモ）
-        if tapButton(["＋ 過去の日を入力", "+ Log a past day"]) {
-            wait(2)
-            tapButton(["外食", "Ate out"], overTabBar: true, front: true); wait(1)
-            swipeSheet(up: true); wait(1.5)
-            XCTAssertTrue(tapButton(["この日をきろくする", "Log this day"], overTabBar: true, front: true), "記録シートの「この日をきろくする」が見つからない")
-            wait(2.5)
-            closeReward()   // はじめての記録のごほうび
-            for _ in 0..<4 { scroll(up: false) }   // きょうの体重のカードまでもどる
-            wait(1)
-        }
-
-        // きょうを記録（少し減らして「運動した」）→ キャラが反応
-        for _ in 0..<4 {
-            tapButton(["0.1kg 減らす", "Decrease by 0.1kg"], timeout: 1); wait(0.35)
-        }
-        wait(0.8)
-        tapButton(["運動した", "Worked out"]); wait(1.2)
-        XCTAssertTrue(tapButton(["きろくする", "Log it"]), "ホームの「きろくする」が見つからない")
-        wait(4)   // キャラの反応とセリフを見せる
-        closeReward()
-
-        // きょうのきぶん：ほかの顔をえらびなおす
-        tapButton(["グッド", "Good"], contains: true, timeout: 2); wait(2.5)
-
-        // ホームを下まで見せる（もくひょうまで・2週間グラフ・りれき）
-        for _ in 0..<3 { scroll(up: true); wait(1.3) }
-        for _ in 0..<3 { scroll(up: false) }
         wait(1)
 
-        // グラフ：期間を切りかえ → カレンダーの日 → 日の詳細
-        if tapButton(["グラフ", "Graph"]) {
-            wait(1.5)
-            passCoachMarks()
-            tapButton(["1週", "1W"]); wait(1.8)
-            tapButton(["3か月", "3M"]); wait(1.8)
-            for _ in 0..<3 { scroll(up: true); wait(1.2) }
-            let day = app.buttons.matching(NSPredicate(format: "label ENDSWITH %@", "kg")).firstMatch
-            if day.waitForExistence(timeout: 2), safeTap(day) {
-                wait(3)
-                scroll(up: true); wait(1.5)
-                scroll(up: false); wait(1)
-                tapButton(["‹"], contains: true); wait(2)
-            }
-        }
-
-        // キャラ：名前をつける → ずかんで顔を変える → ごほうびのお祝い
-        if tapButton(["キャラ", "Buddy"]) {
-            wait(1.5)
-            passCoachMarks()
-            let name = app.textFields.matching(NSPredicate(format: "label IN %@", ["キャラの名前", "Buddy’s name"])).firstMatch
-            if name.waitForExistence(timeout: 2), !overlapsAd(name.frame) {
-                name.tap(); wait(0.8)
-                name.typeText(Locale.preferredLanguages.first?.hasPrefix("ja") == true ? "もち" : "Mochi")
-                wait(0.8)
-                // 入力欄の外（見出し）をタップしてキーボードを閉じる
-                app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.1)).tap()
-                wait(2)
-                closeReward()   // 名前をつけたごほうび
-            }
-            for _ in 0..<2 { scroll(up: true); wait(1.2) }
-            if tapButton(["はじめての", "First"], contains: true, timeout: 1) {
-                closeReward()
-            }
-            for _ in 0..<2 { scroll(up: true); wait(1.2) }
-            tapButton(["どやっ", "Proud"], contains: true); wait(1.5)
-            for _ in 0..<4 { scroll(up: false) }
-            wait(2)
-        }
-
-        // せってい：通知をためす → ウィジェット → バックアップ → CSV
-        if tapButton(["せってい", "Settings"]) {
-            wait(1.5)
-            passCoachMarks()
-            scroll(up: true); wait(1.2)
-            if tapButton(["通知をためす", "Test notification"], contains: true) {
-                wait(4.5)   // 3秒後に届く通知を見せる
-            }
-            if tapButton(["ホーム画面ウィジェット", "Home Screen widget"], contains: true) {
-                wait(3.5)
-                tapButton(["アプリにもどる", "Back to app"], overTabBar: true); wait(1.5)
-            }
-            scroll(up: true); wait(1.2)
-            if tapButton(["バックアップ", "Backup"], contains: true) {
-                wait(3)
-                tapButton(["‹ せってい", "‹ Settings"]); wait(1.5)
-            }
-            if tapButton(["CSVで書き出す", "Export as CSV"], contains: true) {
-                wait(3)
-                closeShareSheet()
-            }
-            for _ in 0..<3 { scroll(up: true); wait(1.2) }
-            for _ in 0..<5 { scroll(up: false) }
+        // 過去の2日を記録：おとといの記録 → きのうは飲み会で増えた
+        if tapButton(["＋ 過去の日を入力", "+ Log a past day"]) {
             wait(1)
+            tapButton(["前の日", "Previous day"], overTabBar: true, front: true); wait(1)
+            swipeSheet(up: true)
+            XCTAssertTrue(tapButton(["この日をきろくする", "Log this day"], overTabBar: true, front: true), "記録シートの「この日をきろくする」が見つからない")
+            wait(1.5)
+            closeReward()   // はじめての記録のごほうび
+        }
+        if tapButton(["＋ 過去の日を入力", "+ Log a past day"]) {
+            wait(1)
+            for _ in 0..<5 {
+                tapButton(["0.1kg 増やす", "Increase by 0.1kg"], timeout: 1, overTabBar: true, front: true)
+            }
+            swipeSheet(up: true)
+            tapButton(["飲み会", "Night out"], overTabBar: true, front: true); wait(0.8)
+            XCTAssertTrue(tapButton(["この日をきろくする", "Log this day"], overTabBar: true, front: true), "記録シートの「この日をきろくする」が見つからない")
+            wait(1.5)
         }
 
-        tapButton(["ホーム", "Home"])
-        wait(3)
+        // もどるまで見守り：増えたあとの雲のカードを見せる
+        XCTAssertNotNil(scrollTo(["もどるまで見守り", "Bounce-back watch"]), "「もどるまで見守り」のカードが出ていない")
+        wait(2)
+
+        settingsSection()
+        graphSection()
+        charaSection()
+        finishOnHome()
+    }
+
+    // MARK: - せってい
+
+    /// 見ないモード：オンにしてホームを見せ、もどしてオフにする。ほかの項目は、スクロールで見せるだけ
+    private func settingsSection() {
+        guard tapButton(["せってい", "Settings"]) else { return }
+        wait(1)
+        passCoachMarks()
+        XCTAssertTrue(setSwitch(["体重の数字をかくす", "Hide my weight"], on: true), "見ないモードのスイッチが押せない")
+        wait(1.5)
+        if tapButton(["ホーム", "Home"]) {
+            wait(2.5)
+            tapButton(["せってい", "Settings"]); wait(1)
+        }
+        XCTAssertTrue(setSwitch(["体重の数字をかくす", "Hide my weight"], on: false), "見ないモードをオフにできない")
+        wait(1)
+        scroll(up: true); wait(1)
+        scroll(up: true); wait(1)
+    }
+
+    // MARK: - グラフ
+
+    private func graphSection() {
+        guard tapButton(["グラフ", "Graph"]) else { return }
+        wait(1)
+        passCoachMarks()
+        for _ in 0..<3 { scroll(up: true) }
+        wait(0.5)
+        let day = app.buttons.matching(NSPredicate(format: "label ENDSWITH %@", "kg")).firstMatch
+        if day.waitForExistence(timeout: 2), safeTap(day) {
+            wait(2)
+            tapButton(["‹"], contains: true); wait(1)
+        }
+    }
+
+    // MARK: - キャラ
+
+    private func charaSection() {
+        guard tapButton(["キャラ", "Buddy"]) else { return }
+        wait(1)
+        passCoachMarks()
+        scrollTo(["はらした もやもや", "Clouds cleared"]); wait(2)
+    }
+
+    // MARK: - ホーム（3回目の記録。このあとはタブを切りかえない）
+
+    private func finishOnHome() {
+        guard tapButton(["ホーム", "Home"]) else { return }
+        wait(1.5)
+
+        // 少し減らして、もとの体重にもどす → 記録するともやもやがはれる
+        for _ in 0..<4 {
+            tapButton(["0.1kg 減らす", "Decrease by 0.1kg"], timeout: 1)
+        }
+        wait(0.5)
+        XCTAssertTrue(tapButton(["きろくする", "Log it"]), "ホームの「きろくする」が見つからない")
+        wait(3.5)   // キャラの反応と紙ふぶきを見せる
+        closeReward(timeout: 1)
+        XCTAssertNotNil(scrollTo(["もやもや、はれた", "cloud cleared"]), "もやもやがはれたカードが出ていない")
+        wait(1.5)
+
+        // ごほうびの日せんげん
+        tapButton(["せんげんする", "Declare"]); wait(2)
+
+        // シェアカード：数字なしのカードを見せて閉じる（共有メニューは開かない）
+        for _ in 0..<3 { scroll(up: false) }
+        if tapButton(["シェア", "Share"], contains: true) {
+            wait(2.5)
+            tapButton(["とじる", "Close"], overTabBar: true, front: true)
+        }
+        wait(2)
     }
 
     // MARK: - 起動
@@ -168,9 +165,12 @@ final class ReviewWalkthroughTests: XCTestCase {
     private func launchFromHomeScreen() {
         XCUIDevice.shared.press(.home)
         wait(1.5)
+        // 入れた直後はアイコンがまだないことがあるので、ホーム画面に出るまで待つ
+        let icon = springboard.icons.matching(NSPredicate(format: "label IN %@", ["たいかん！", "Taikan!"])).firstMatch
+        _ = icon.waitForExistence(timeout: 10)
         // アイコンが2ページめ以降にあるときは、横にめくって探す
         for page in 0..<5 {
-            for name in ["体重きろく", "Weight Buddy"] {
+            for name in ["たいかん！", "Taikan!"] {
                 let icon = springboard.icons[name]
                 if icon.exists, icon.isHittable {
                     wait(1)
@@ -185,9 +185,9 @@ final class ReviewWalkthroughTests: XCTestCase {
         if search.waitForExistence(timeout: 2) {
             search.tap()
             wait(1)
-            search.typeText(Locale.preferredLanguages.first?.hasPrefix("ja") == true ? "体重きろく" : "Weight Buddy")
+            search.typeText(Locale.preferredLanguages.first?.hasPrefix("ja") == true ? "たいかん！" : "Taikan!")
             wait(1.5)
-            for name in ["体重きろく", "Weight Buddy"] {
+            for name in ["たいかん！", "Taikan!"] {
                 let icon = springboard.icons[name].firstMatch
                 if icon.exists, icon.isHittable { icon.tap(); return }
             }
@@ -203,14 +203,14 @@ final class ReviewWalkthroughTests: XCTestCase {
         guard findButton(["スキップ", "Skip"], timeout: 3) != nil else { return }
         var count = 0
         while count < 8, findButton(["スキップ", "Skip"]) != nil {
-            wait(2.4)   // 見ている人が読めるように少し待つ
+            wait(1.5)   // 見ている人が読めるように少し待つ
             guard let next = findButton(["つぎへ", "Next", "はじめる", "Get started"]) else { break }
             // 案内は暗幕の上に出るので、タブバーには隠れない（広告だけ避ける）
             if !overlapsAd(next.frame) { next.tap() }
             count += 1
-            wait(0.6)
+            wait(0.3)
         }
-        wait(1)
+        wait(0.5)
     }
 
     /// springboard のダイアログ（通知の許可・トラッキング許可）に答える
@@ -218,7 +218,7 @@ final class ReviewWalkthroughTests: XCTestCase {
     private func answerAlert(allow: Bool, timeout: Double) {
         let alert = springboard.alerts.firstMatch
         guard alert.waitForExistence(timeout: timeout) else { return }
-        wait(2)
+        wait(1)
         let buttons = alert.buttons
         let b = buttons.element(boundBy: allow ? max(0, buttons.count - 1) : 0)
         if b.exists { b.tap() }
@@ -229,22 +229,11 @@ final class ReviewWalkthroughTests: XCTestCase {
     private func closeReward(timeout: Double = 2.5) {
         var count = 0
         while count < 3, let b = findButton(["ありがとう！", "Thank you!"], timeout: count == 0 ? timeout : 1.5) {
-            wait(3)
+            wait(1.5)
             safeTap(b)
             count += 1
-            wait(1.5)
+            wait(0.8)
         }
-    }
-
-    /// CSV の共有シートを閉じる（閉じるボタンがなければ下へスワイプ）
-    private func closeShareSheet() {
-        for l in ["閉じる", "Close"] {
-            let b = app.buttons[l].firstMatch
-            if b.waitForExistence(timeout: 1.5), b.isHittable { b.tap(); wait(1.5); return }
-        }
-        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.45))
-            .press(forDuration: 0.05, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.98)))
-        wait(1.5)
     }
 
     // MARK: - 操作
@@ -257,6 +246,38 @@ final class ReviewWalkthroughTests: XCTestCase {
         let b = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: up ? 0.3 : 0.62))
         a.press(forDuration: 0.05, thenDragTo: b)
         wait(0.5)
+    }
+
+    /// カードの見出しなどの文字が見えるところまでスクロールする
+    @discardableResult
+    private func scrollTo(_ labels: [String]) -> XCUIElement? {
+        for i in 0..<9 {
+            for l in labels {
+                let e = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", l)).firstMatch
+                if e.exists, e.isHittable, !isCovered(e) { return e }
+            }
+            scroll(up: i < 6)
+        }
+        return nil
+    }
+
+    /// スイッチを on にする（すでにそうなら何もしない）。見えて押せるところまでスクロールする
+    private func setSwitch(_ labels: [String], on: Bool) -> Bool {
+        let e = app.switches.matching(NSPredicate(format: "label IN %@", labels)).firstMatch
+        guard e.waitForExistence(timeout: 3) else { return false }
+        var tries = 0
+        while (!e.isHittable || isCovered(e)) && tries < 10 {
+            scroll(up: e.frame.midY > app.frame.height * 0.4)
+            tries += 1
+        }
+        if Self.isOn(e) == on { return true }
+        guard safeTap(e) else { return false }
+        wait(0.8)
+        return Self.isOn(e) == on || on   // オンにするときは、許可の画面が重なって読めないことがある
+    }
+
+    private static func isOn(_ e: XCUIElement) -> Bool {
+        ["オン", "On", "1"].contains(e.value as? String ?? "")
     }
 
     /// 記録シートの中をスクロールする（シートは画面の下のほうにあるので、少し下寄りで引く）

@@ -10,5 +10,9 @@ import WidgetKit
 struct KawaiiWidgetBundle: WidgetBundle {
     var body: some Widget {
         KawaiiWidget()
+        LockFaceWidget()
+        LockAverageWidget()
+        LockGoalWidget()
+        RecordControl()
     }
 }

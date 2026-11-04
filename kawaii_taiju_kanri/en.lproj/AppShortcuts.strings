@@ -1,0 +1,4 @@
+"${applicationName}で体重をきろく" = "Log my weight in ${applicationName}";
+"${applicationName}で体重を記録" = "Record my weight in ${applicationName}";
+"${applicationName}できょうの体重" = "Today’s weight in ${applicationName}";
+"${applicationName}で7日平均" = "7-day average in ${applicationName}";

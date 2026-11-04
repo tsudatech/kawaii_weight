@@ -25,8 +25,8 @@ struct OnboardingView: View {
     private let steps: [Step] = [
         Step(face: "lg_happy", bubble: L("はじめまして！"), title: L("まいにちの体重を\nいっしょにきろくしよう"), text: L("朝いちばんに体重計にのって、ここにきろくしてね。増えた日も減った日も、ちゃんとそばにいるよ。"), button: L("はじめる")),
         Step(face: "lg_hmm", bubble: L("からだのことを教えてね"), text: L("もくひょうまでの進み具合と、BMIの計算につかうよ。あとから変えられるよ。"), kind: .body, button: L("つぎへ")),
-        Step(face: "yawn", bubble: L("毎日、声をかけてもいい？"), text: L("はかり忘れないように、決まった時間におしらせするよ。"), kind: .notify, button: L("おしらせをうけとる"), skip: L("いまはいい")),
-        Step(face: "cheer", bubble: L("じゅんびできた！"), title: L("さっそく、はかってみよう"), text: L("さいしょの体重が、ゴールまでのスタート地点になるよ。"), button: L("きょうの体重をきろくする")),
+        Step(face: "lg_sleepy", bubble: L("毎日、声をかけてもいい？"), text: L("はかり忘れないように、決まった時間におしらせするよ。"), kind: .notify, button: L("おしらせをうけとる"), skip: L("いまはいい")),
+        Step(face: "lg_cheer", bubble: L("じゅんびできた！"), title: L("さっそく、はかってみよう"), text: L("さいしょの体重が、ゴールまでのスタート地点になるよ。"), button: L("きょうの体重をきろくする")),
     ]
 
     var body: some View {

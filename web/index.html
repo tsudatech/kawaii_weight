@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title data-i18n-key="page_title">かわいい体重きろく - まいにちの体重に、キャラが反応。</title>
+    <title data-i18n-key="page_title">たいかん！ - ふえても大丈夫。もどるまで、キャラが見守る体重きろく</title>
     <meta
       name="description"
       data-i18n-key="meta_description"
-      content="かわいい体重きろくは、まいにちの体重に合わせてキャラの表情が変わる、iPhone 向けの体重管理アプリです。減った日はいっしょによろこび、増えた日はやさしく受けとめてくれます。グラフ・カレンダー・もくひょうまでの道のり・ごほうび・ホーム画面ウィジェットつき。ログインは不要です。"
+      content="たいかん！は、体重が増えた日に、もとにもどるまでキャラが見守ってくれる iPhone 向けの体重記録アプリです。食べる日を先に伝えられる「ごほうびの日」、数字をかくせる「見ないモード」、14の表情、数字なしのシェアカード、ウィジェットつき。ログインは不要です。"
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -16,17 +16,19 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
-    <link rel="icon" type="image/svg+xml" href="images/faces/lg_happy.svg" />
+    <link rel="icon" type="image/png" href="images/app-icon.png" />
+    <link rel="apple-touch-icon" href="images/app-icon.png" />
   </head>
   <body>
     <!-- Header -->
     <header class="header">
       <nav class="nav-container">
         <a class="nav-logo" href="#">
-          <img src="images/faces/lg_happy.svg" alt="" class="nav-logo-mark" />
-          <h1 data-i18n-key="app_name">かわいい体重きろく</h1>
+          <img src="images/app-icon.png" alt="" class="nav-logo-mark" />
+          <h1 data-i18n-key="app_name">たいかん！</h1>
         </a>
         <ul class="nav-menu">
+          <li><a href="#highlights" data-i18n-key="nav_highlights">とくちょう</a></li>
           <li><a href="#faces" data-i18n-key="nav_faces">表情</a></li>
           <li><a href="#features" data-i18n-key="nav_features">機能</a></li>
           <li><a href="#download" data-i18n-key="nav_download">ダウンロード</a></li>
@@ -45,34 +47,62 @@
     <section class="hero">
       <div class="hero-container">
         <div class="hero-content">
-          <p class="hero-eyebrow" data-i18n-key="hero_eyebrow">キャラといっしょの体重管理</p>
+          <p class="hero-eyebrow" data-i18n-key="hero_eyebrow">キャラといっしょの体重きろく</p>
           <h2 class="hero-title">
-            <span data-i18n-key="hero_title_line1">まいにちの体重に、</span>
-            <span class="hero-title-accent" data-i18n-key="hero_title_line2">キャラが反応。</span>
+            <span data-i18n-key="hero_title_line1">増えた日も、</span>
+            <span class="hero-title-accent" data-i18n-key="hero_title_line2">ひとりで落ちこまない。</span>
           </h2>
-          <p class="hero-description" data-i18n-key="hero_description">
-            朝いちばんに体重計にのって、きろくするだけ。減った日はいっしょによろこんで、増えた日はやさしく受けとめてくれる、ちいさな相棒といっしょに続ける体重管理アプリです。
-          </p>
+          <p class="hero-description" data-i18n-key="hero_description">飲み会のあとに増えても、もとの体重にもどるまでキャラがいっしょに見守ります。食べる日は先に伝えておけて、数字を見たくない日は、表情とことばだけで伝えます。</p>
           <div class="hero-buttons">
             <a href="#download" class="btn btn-primary" data-i18n-key="hero_cta_download">ダウンロード</a>
-            <a href="#faces" class="btn btn-outline" data-i18n-key="hero_cta_faces">表情を見る</a>
+            <a href="#highlights" class="btn btn-outline" data-i18n-key="hero_cta_faces">とくちょうを見る</a>
           </div>
         </div>
         <div class="hero-image">
           <!-- ホームと同じ、キャラとふきだし -->
           <div class="hero-stage">
-            <div class="hero-bubble" data-i18n-key="hero_bubble">やったー！ちゃんと減ってるよ！</div>
-            <img src="images/faces/lg_happy.svg" alt="" class="hero-chara" />
+            <div class="hero-bubble" data-i18n-key="hero_bubble">もやもや、はれたよ！</div>
+            <img src="images/faces/lg_happy.png" alt="" class="hero-chara" />
             <div class="hero-weight">
               <span class="hero-weight-num">57.8</span><span class="hero-weight-unit">kg</span>
               <span class="hero-weight-delta">−0.4kg</span>
             </div>
           </div>
           <div class="hero-faces" aria-hidden="true">
-            <img src="images/faces/lg_good.svg" alt="" />
-            <img src="images/faces/surprise.png" alt="" />
-            <img src="images/faces/lg_trouble.svg" alt="" />
-            <img src="images/faces/cozy.png" alt="" />
+            <img src="images/faces/lg_good.png" alt="" />
+            <img src="images/faces/lg_surprise.png" alt="" />
+            <img src="images/faces/lg_trouble.png" alt="" />
+            <img src="images/faces/lg_cozy.png" alt="" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Highlights Section -->
+    <section class="highlights" id="highlights">
+      <div class="container">
+        <h2 class="section-title" data-i18n-key="highlights_title">たいかん！ならではの3つ</h2>
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon"><div class="icon-placeholder">☁️</div></div>
+            <h3 data-i18n-key="highlight_watch_title">もどるまで見守り</h3>
+            <p data-i18n-key="highlight_watch_text">
+              飲み会や外食のあとに増えると、「もやもや雲」のカードが出ます。もとの体重（その前の7日平均）にもどったら「はれた！」。何日でもどったかが残り、2週間もどらなくても失敗あつかいにはしません。
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon"><div class="icon-placeholder">🍰</div></div>
+            <h3 data-i18n-key="highlight_treat_title">ごほうびの日せんげん</h3>
+            <p data-i18n-key="highlight_treat_text">
+              ケーキや飲み会の予定があれば、前の日に「あしたは ごほうびの日」と伝えておけます。その日と翌朝に増えても、キャラは「たのしかった？」と受けとめて、そのまま見守ります。
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon"><div class="icon-placeholder">👀</div></div>
+            <h3 data-i18n-key="highlight_hide_title">見ないモード</h3>
+            <p data-i18n-key="highlight_hide_text">
+              数字を見たくない日に。体重をぼかして、グラフの目盛りもかくします。「きろくしたよ」「いい流れだよ」と、キャラの表情とことばだけで伝えます。記録はいつもどおりできます。
+            </p>
           </div>
         </div>
       </div>
@@ -87,84 +117,84 @@
         </p>
         <div class="faces-grid">
           <div class="face-card">
-            <img src="images/faces/lg_happy.svg" alt="" loading="lazy" />
+            <img src="images/faces/lg_happy.png" alt="" loading="lazy" />
             <div class="face-body">
               <h3 data-i18n-key="face_happy_title">るんるん</h3>
               <p data-i18n-key="face_happy_text">0.3kg 以上へった日、はじめてのきろく</p>
             </div>
           </div>
           <div class="face-card">
-            <img src="images/faces/lg_good.svg" alt="" loading="lazy" />
+            <img src="images/faces/lg_good.png" alt="" loading="lazy" />
             <div class="face-body">
               <h3 data-i18n-key="face_good_title">グッド</h3>
               <p data-i18n-key="face_good_text">少しへった日、もくひょうに届いた日</p>
             </div>
           </div>
           <div class="face-card">
-            <img src="images/faces/surprise.png" alt="" loading="lazy" />
+            <img src="images/faces/lg_surprise.png" alt="" loading="lazy" />
             <div class="face-body">
               <h3 data-i18n-key="face_surprise_title">びっくり</h3>
               <p data-i18n-key="face_surprise_text">0.8kg 以上へった日</p>
             </div>
           </div>
           <div class="face-card">
-            <img src="images/faces/doya.png" alt="" loading="lazy" />
+            <img src="images/faces/lg_doya.png" alt="" loading="lazy" />
             <div class="face-body">
               <h3 data-i18n-key="face_doya_title">どやっ</h3>
               <p data-i18n-key="face_doya_text">いちばん軽い記録を更新した日</p>
             </div>
           </div>
           <div class="face-card">
-            <img src="images/faces/lg_hmm.svg" alt="" loading="lazy" />
+            <img src="images/faces/lg_hmm.png" alt="" loading="lazy" />
             <div class="face-body">
               <h3 data-i18n-key="face_hmm_title">うーん</h3>
               <p data-i18n-key="face_hmm_text">±0.1kg の横ばいの日</p>
             </div>
           </div>
           <div class="face-card">
-            <img src="images/faces/lg_trouble.svg" alt="" loading="lazy" />
+            <img src="images/faces/lg_trouble.png" alt="" loading="lazy" />
             <div class="face-body">
               <h3 data-i18n-key="face_trouble_title">こまった</h3>
               <p data-i18n-key="face_trouble_text">0.1〜0.5kg ふえた日</p>
             </div>
           </div>
           <div class="face-card">
-            <img src="images/faces/lg_crying.svg" alt="" loading="lazy" />
+            <img src="images/faces/lg_crying.png" alt="" loading="lazy" />
             <div class="face-body">
               <h3 data-i18n-key="face_crying_title">なきそう</h3>
               <p data-i18n-key="face_crying_text">0.5kg 以上ふえた日（きびしめモードでは 0.3kg）</p>
             </div>
           </div>
           <div class="face-card">
-            <img src="images/faces/lg_angry.svg" alt="" loading="lazy" />
+            <img src="images/faces/lg_angry.png" alt="" loading="lazy" />
             <div class="face-body">
               <h3 data-i18n-key="face_angry_title">おこ</h3>
               <p data-i18n-key="face_angry_text">1kg 以上ふえた日</p>
             </div>
           </div>
           <div class="face-card">
-            <img src="images/faces/cozy.png" alt="" loading="lazy" />
+            <img src="images/faces/lg_cozy.png" alt="" loading="lazy" />
             <div class="face-body">
               <h3 data-i18n-key="face_cozy_title">ぬくぬく</h3>
-              <p data-i18n-key="face_cozy_text">ふえた日に「のんびり」のタグ</p>
+              <p data-i18n-key="face_cozy_text">ふえた日に「のんびり」のタグ、ごほうびの日とその翌朝</p>
             </div>
           </div>
           <div class="face-card">
-            <img src="images/faces/nightcap.png" alt="" loading="lazy" />
+            <img src="images/faces/lg_nightcap.png" alt="" loading="lazy" />
             <div class="face-body">
               <h3 data-i18n-key="face_nightcap_title">ねぶそく</h3>
               <p data-i18n-key="face_nightcap_text">ふえた日に「寝不足」のタグ</p>
             </div>
           </div>
           <div class="face-card">
-            <img src="images/faces/yawn.png" alt="" loading="lazy" />
+            <img src="images/faces/lg_sleepy.png" alt="" loading="lazy" />
             <div class="face-body">
               <h3 data-i18n-key="face_sleepy_title">ねむい</h3>
               <p data-i18n-key="face_sleepy_text">きょうはまだはかっていないとき</p>
             </div>
           </div>
           <div class="face-card">
-            <img src="images/faces/lonely.png" alt="" loading="lazy" />
+            <img src="images/faces/lg_lonely.png" alt="" loading="lazy" />
             <div class="face-body">
               <h3 data-i18n-key="face_lonely_title">さみしい</h3>
               <p data-i18n-key="face_lonely_text">3日以上あいて、ひさしぶりに開いたとき</p>
@@ -225,6 +255,34 @@
             </p>
           </div>
           <div class="feature-card">
+            <div class="feature-icon"><div class="icon-placeholder">🔐</div></div>
+            <h3 data-i18n-key="feature_lock_title">ロック画面ウィジェット</h3>
+            <p data-i18n-key="feature_lock_text">
+              表情・7日平均・もくひょうの進み具合が見られます。「体重をきろく」のボタンを置けば、押すだけで体重の入力画面が開きます。
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon"><div class="icon-placeholder">🎙️</div></div>
+            <h3 data-i18n-key="feature_siri_title">Siri・ショートカット</h3>
+            <p data-i18n-key="feature_siri_text">
+              「たいかん！で体重をきろく」と話しかけると、何キロかを聞いて記録します。きょうの体重や7日平均もたずねられます。
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon"><div class="icon-placeholder">📮</div></div>
+            <h3 data-i18n-key="feature_share_title">数字なしでシェア</h3>
+            <p data-i18n-key="feature_share_text">
+              その日のキャラや1週間の流れを、画像カードにしてシェアできます。体重の数字は「のせる」を選んだときだけ。色は4種類です。
+            </p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon"><div class="icon-placeholder">🔮</div></div>
+            <h3 data-i18n-key="feature_guess_title">体重よそう</h3>
+            <p data-i18n-key="feature_guess_text">
+              はかる前に「ふえた・おなじ・へった」を当ててポイントをためるゲーム。キャラとの勝負もできます。せっていでオンにしたときだけ出ます。
+            </p>
+          </div>
+          <div class="feature-card">
             <div class="feature-icon"><div class="icon-placeholder">☁️</div></div>
             <h3 data-i18n-key="feature_icloud_title">iCloud に預けられる</h3>
             <p data-i18n-key="feature_icloud_text">
@@ -278,23 +336,22 @@
         <h2 class="section-title" data-i18n-key="privacy_title">プライバシーポリシー</h2>
         <div class="privacy-content">
           <h3 data-i18n-key="privacy_handling_heading">個人情報の取り扱いについて</h3>
-          <p data-i18n-key="privacy_handling_text">
-            かわいい体重きろく（以下「本アプリ」）は、利用者のプライバシーを尊重し、個人情報の保護に努めます。本アプリはアカウント登録を必要とせず、開発者のサーバーを持ちません。
-          </p>
+          <p data-i18n-key="privacy_handling_text">たいかん！（以下「本アプリ」）は、利用者のプライバシーを尊重し、個人情報の保護に努めます。本アプリはアカウント登録を必要とせず、開発者のサーバーを持ちません。</p>
 
           <h4 data-i18n-key="privacy_collect_heading">扱う情報</h4>
           <p data-i18n-key="privacy_collect_text">
-            本アプリが扱うのは、利用者が入力した体重・体脂肪率・タグ・メモ・きぶん、身長ともくひょう体重、キャラの名前、ごほうびの達成状況、および各種設定だけで、これらはすべて端末の中に留まります。開発者が氏名・メールアドレス・位置情報を収集することはありません。開発者自身は利用状況の解析（アナリティクス）を行いません。ただし、広告の表示のために、下記「広告について」のとおり Google が情報を扱います。
+            本アプリが扱うのは、利用者が入力した体重・体脂肪率・タグ・メモ・きぶん・ごほうびの日・体重よそう、身長ともくひょう体重、キャラの名前、ごほうびの達成状況、および各種設定だけで、これらはすべて端末の中に留まります（iCloud バックアップを有効にした場合を除きます）。開発者が氏名・メールアドレス・位置情報を収集することはありません。開発者自身は利用状況の解析（アナリティクス）を行いません。ただし、広告の表示のために、下記「広告について」のとおり Google が情報を扱います。
           </p>
 
           <h4 data-i18n-key="privacy_storage_heading">情報の保存</h4>
-          <p data-i18n-key="privacy_storage_text">
-            記録と設定は、端末内のアプリ専用の領域に保存されます。ホーム画面ウィジェットに表示するため、きょうの表情・体重・連続日数などを、同じ端末の中でアプリとウィジェットが共有する領域（App Group）にも保存します。
-          </p>
+          <p data-i18n-key="privacy_storage_text">記録と設定は、端末内のアプリ専用の領域に保存されます。ホーム画面・ロック画面のウィジェットに表示するため、きょうの表情・体重・7日平均・もくひょうの進み具合・連続日数などを、同じ端末の中でアプリとウィジェットが共有する領域（App Group）にも保存します。</p>
 
           <h4 data-i18n-key="privacy_icloud_heading">iCloud について</h4>
-          <p data-i18n-key="privacy_icloud_text">
-            設定で iCloud バックアップを有効にした場合に限り、体重の記録・ごほうび・キャラの名前が iCloud のキーバリューストアに保存され、同じ Apple アカウントの端末間で同期されます。この同期は Apple の iCloud 上で完結し、開発者がその内容を参照することはできません。設定は同期されず、その端末にだけ残ります。
+          <p data-i18n-key="privacy_icloud_text">設定で iCloud バックアップを有効にした場合に限り、体重の記録（体重よそうをふくむ）・ごほうびの日・ごほうび・キャラの名前が iCloud のキーバリューストアに保存され、同じ Apple アカウントの端末間で同期されます。この同期は Apple の iCloud 上で完結し、開発者がその内容を参照することはできません。設定は同期されず、その端末にだけ残ります。</p>
+
+          <h4 data-i18n-key="privacy_siri_heading">Siri・シェアについて</h4>
+          <p data-i18n-key="privacy_siri_text">
+            Siri やショートカットで話した内容は、Apple のサービスが扱います。開発者には送られません。シェアカードは端末の中で画像を作り、利用者が選んだ共有先に渡します。「写真に保存」を選んだときだけ、写真ライブラリに追加するための許可を求めます。
           </p>
 
           <h4 data-i18n-key="privacy_notification_heading">通知について</h4>
@@ -309,7 +366,7 @@
 
           <h4 data-i18n-key="privacy_network_heading">外部との通信</h4>
           <p data-i18n-key="privacy_network_text">
-            本アプリは、開発者のサーバーへ利用者の記録を送信しません。ネットワークを使うのは、広告の表示のための Google との通信と、利用者が iCloud バックアップを有効にした場合の Apple のサービスとの通信だけです。体重の記録が Google に送られることはありません。CSV の書き出しは、利用者が共有先を選んだときにだけ行われます。
+            本アプリは、開発者のサーバーへ利用者の記録を送信しません。本アプリが行う通信は、広告の表示のための Google との通信と、利用者が iCloud バックアップを有効にした場合の Apple のサービスとの通信だけです。体重の記録が Google に送られることはありません。CSV の書き出しとシェアカードの共有は、利用者が共有先を選んだときにだけ行われます。
           </p>
 
           <h4 data-i18n-key="privacy_health_heading">健康に関する情報について</h4>
@@ -334,7 +391,7 @@
             ><span data-i18n-key="privacy_contact_text_after">までご連絡ください。</span>
           </p>
 
-          <p class="privacy-update" data-i18n-key="privacy_update">最終更新: 2026 年 10 月</p>
+          <p class="privacy-update" data-i18n-key="privacy_update">最終更新: 2026 年 11 月</p>
         </div>
       </div>
     </section>
@@ -373,7 +430,7 @@
     <footer class="footer">
       <div class="container">
         <div class="footer-bottom">
-          <p data-i18n-key="footer_copyright">© 2026 かわいい体重きろく. All rights reserved.</p>
+          <p data-i18n-key="footer_copyright">© 2026 たいかん！. All rights reserved.</p>
         </div>
       </div>
     </footer>

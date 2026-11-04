@@ -18,7 +18,9 @@ struct SettingsView: View {
             judgeGroup.coachTarget("settings.judge").padding(.top, 18)
             recordGroup.padding(.top, 18)
             notifyGroup.padding(.top, 18)
-            widgetGroup.padding(.top, 18)
+            playGroup.padding(.top, 18)
+            hideGroup.padding(.top, 18)
+            iPhoneGroup.padding(.top, 18)
             charaGroup.padding(.top, 18)
             dataGroup.padding(.top, 18)
             #if DEBUG
@@ -118,12 +120,60 @@ struct SettingsView: View {
         }
     }
 
-    // MARK: - ウィジェット
+    // MARK: - あそび
 
-    private var widgetGroup: some View {
-        SettingsGroup(title: L("ウィジェット")) {
+    private var playGroup: some View {
+        SettingsGroup(
+            title: L("あそび"),
+            footer: L("オンにすると、ホームの体重入力に「よそう」が出るよ。あたるとポイントがたまって、キャラタブに成績が出るよ")
+        ) {
+            SettingsToggleRow(
+                icon: "🎯", iconBG: Color(hex: 0xFFF3D9), label: L("体重よそう"),
+                note: L("はかる前に「ふえた・おなじ・へった」を当てるゲーム"),
+                isOn: Binding(get: { store.settings.game }, set: { on in
+                    store.settings.game = on
+                    store.showToast(on ? L("体重よそうをオンにしました。ホームに出るよ") : L("体重よそうをオフにしました"))
+                })
+            )
+        }
+    }
+
+    // MARK: - 見ないモード
+
+    private var hideGroup: some View {
+        SettingsGroup(
+            title: L("見ないモード"),
+            footer: L("数字を見たくない日に。体重はぼかして、キャラの表情とことばだけで伝えるよ。記録はいつもどおりできるよ")
+        ) {
+            SettingsToggleRow(
+                icon: "👀", iconBG: Color(hex: 0xF3EEE9), label: L("体重の数字をかくす"),
+                isOn: Binding(get: { store.settings.hideNumbers }, set: { on in
+                    store.settings.hideNumbers = on
+                    store.showToast(on ? L("体重の数字をかくしました") : L("数字を表示します"))
+                })
+            )
+        }
+    }
+
+    // MARK: - iPhone とのれんけい
+
+    private var iPhoneGroup: some View {
+        SettingsGroup(title: L("iPhone とのれんけい")) {
+            #if HEALTH_SYNC
+            SettingsToggleRow(
+                icon: "❤️", iconBG: Color(hex: 0xFDECEC), label: L("ヘルスケアと同期"),
+                note: L("体重計アプリの記録を読みこみ、ここでの記録も書きこむよ"),
+                isOn: Binding(get: { store.settings.health }, set: { store.setHealth($0) })
+            )
+            #endif
             PreviewRow(icon: "🧩", iconBG: Color(hex: 0xE6F4F5), label: L("ホーム画面ウィジェット"), note: L("きょうの表情と体重が見られるよ")) {
                 store.showWidgetPreview = true
+            }
+            PreviewRow(icon: "🔒", iconBG: Color(hex: 0xE6F4F5), label: L("ロック画面ウィジェット"), note: L("ロック画面で見られて、1タップで体重入力へ")) {
+                store.showLockPreview = true
+            }
+            PreviewRow(icon: "🎙️", iconBG: Color(hex: 0xEFEAF8), label: L("Siri・ショートカット"), note: LF("「Hey Siri、%@で体重をきろく」", L("たいかん！"))) {
+                store.showSiriPreview = true
             }
         }
     }
@@ -285,10 +335,11 @@ struct SettingsToggleRow: View {
     let icon: String
     let iconBG: Color
     let label: String
+    var note: String?
     @Binding var isOn: Bool
 
     var body: some View {
-        SettingsRow(icon: icon, iconBG: iconBG, label: label) {
+        SettingsRow(icon: icon, iconBG: iconBG, label: label, note: note) {
             CSSSwitch(isOn: $isOn, label: label)
         }
     }

@@ -16,7 +16,7 @@ struct HomeView: View {
 
     var body: some View {
         ScreenScroll(position: $position) {
-            ScreenHeader(caption: Fmt.dayTitle(.today), title: L("きろく")) {
+            ScreenHeader(caption: Fmt.dayTitle(.today), title: L("きろく"), badge: store.settings.hideNumbers ? L("見ないモード") : nil) {
                 Pill(prefix: "🔥", value: "\(store.streak)", suffix: LF("%d日:単位", store.streak))
                     .coachTarget("home.streak")
                     .accessibilityLabel(LF("連続記録日数 %d日", store.streak))
@@ -35,6 +35,16 @@ struct HomeView: View {
                 )
                 .coachTarget("home.record")
                 .padding(.top, 14)
+            } else {
+                if store.settings.game && store.sortedDates.count > 1 {
+                    GuessResultCard().padding(.top, 14)
+                }
+            }
+            if store.watches.active != nil || store.clearedWatchToday != nil {
+                WatchCard().padding(.top, 14)
+            }
+            if store.isTodayRecorded {
+                TreatCard().padding(.top, 14)
             }
             GoalCard().padding(.top, 14)
             recentChartCard.padding(.top, 14)
@@ -93,7 +103,9 @@ struct HomeHeroCard: View {
     @State private var talkIndex = 0
 
     var body: some View {
-        let state = store.todayState
+        let base = store.todayState
+        // よそう・ごほうびの日を押したときは、その場のひとことを先に出す
+        let state = (mood: store.heroSay?.mood ?? base.mood, line: store.heroSay?.line ?? base.line)
         let recorded = store.isTodayRecorded
         let talk = store.settings.talk
         let charSize: CGFloat = recorded ? 120 : 128
@@ -104,7 +116,13 @@ struct HomeHeroCard: View {
                     size: charSize,
                     bounceKey: store.homeBounce,
                     shake: state.mood.isSad,
-                    onTap: { talkIndex += 1 }
+                    onTap: {
+                        if store.heroSay != nil {
+                            store.heroSay = nil
+                        } else {
+                            talkIndex += 1
+                        }
+                    }
                 )
                 .frame(maxWidth: !recorded && !talk ? .infinity : nil)
                 .accessibilityLabel(LF("%@：タップでしゃべる", state.mood.label))
@@ -131,6 +149,11 @@ struct HomeHeroCard: View {
         .heroBackground()
         .onChange(of: state.mood) { _, _ in talkIndex = 0 }
         .onChange(of: store.homeBounce) { _, _ in talkIndex = 0 }
+        .onChange(of: store.heroSay) { _, say in
+            talkIndex = 0
+            if say != nil { store.homeBounce += 1 }
+        }
+        .onDisappear { store.heroSay = nil }
     }
 
     /// .doneInfo
@@ -141,14 +164,24 @@ struct HomeHeroCard: View {
         let prev = store.sortedDates.last { $0 < .today }
         let label = store.settings.judge == .trend ? L("7日平均から")
             : prev.map { $0.days(to: .today) == 1 } ?? true ? L("まえの日から") : L("まえの記録から")
+        let hide = store.settings.hideNumbers
         return VStack(alignment: .leading, spacing: 0) {
-            HStack(alignment: .firstTextBaseline, spacing: 3) {
-                Text(entry.map { Fmt.kg($0.weight) } ?? "—").font(.num(42)).numLineHeight(1, size: 42)
-                Text("kg").font(.ui(14)).foregroundStyle(Palette.inkSoft)
+            if hide {
+                Text(L("きろくしたよ")).font(.ui(24, .black)).foregroundStyle(Palette.ink)
+            } else {
+                HStack(alignment: .firstTextBaseline, spacing: 3) {
+                    Text(entry.map { Fmt.kg($0.weight) } ?? "—").font(.num(42)).numLineHeight(1, size: 42)
+                    Text("kg").font(.ui(14)).foregroundStyle(Palette.inkSoft)
+                }
+                .foregroundStyle(Palette.ink)
             }
-            .foregroundStyle(Palette.ink)
             Group {
-                if let diff = j?.diff {
+                if hide, let diff = j?.diff {
+                    Text(diff <= -0.1 ? L("いい流れだよ") : diff <= 0.1 ? L("いつもどおり") : L("ちょっとふえ気味"))
+                        .font(.ui(15))
+                        // ±0.1kg は「いつもどおり」なので、増減の色をつけない
+                        .foregroundStyle(abs(diff) <= 0.1 ? Palette.ink : deltaColor(diff))
+                } else if let diff = j?.diff {
                     Text("\(Text(num: label + " ", size: 15, weight: .bold))\(Text(num: "\(Fmt.signed(diff))kg", size: 15, weight: .bold).foregroundStyle(deltaColor(diff)))")
                 } else if store.sortedDates.count <= 1 {
                     Text(num: L("はじめての記録だよ"), size: 15, weight: .bold)
@@ -159,8 +192,19 @@ struct HomeHeroCard: View {
             }
             .foregroundStyle(Palette.ink)
             .padding(.top, 2)
-            LinkButton(title: L("記録を修正"), underline: true) { store.editing = SheetTarget(date: .today) }
-                .padding(.top, 4)
+            HStack(spacing: 12) {
+                Button { store.sharingDate = .today } label: {
+                    Label(L("シェア"), systemImage: "square.and.arrow.up")
+                        .labelStyle(ShareLabelStyle())
+                        .font(.ui(12, .black))
+                        .foregroundStyle(Palette.onInk)
+                        .padding(.vertical, 5).padding(.leading, 9).padding(.trailing, 11)
+                        .background(Capsule().fill(Palette.rose))
+                }
+                .buttonStyle(.plain)
+                LinkButton(title: L("記録を修正"), underline: true) { store.editing = SheetTarget(date: .today) }
+            }
+            .padding(.top, 4)
         }
         .padding(.leading, 4)
     }
@@ -188,15 +232,15 @@ struct HomeHeroCard: View {
         let left = store.latestWeight.map { max(0, $0 - store.settings.goal) }
         return HStack(spacing: 6) {
             statTile(L("7日平均")) {
-                if let avg { kgValue(Fmt.kg(avg)) } else { Text("—").font(.num(15, .bold)) }
+                if let avg { kgValue(Fmt.kg(avg)).hiddenNumber() } else { Text("—").font(.num(15, .bold)) }
             }
-            statTile(L("もくひょう")) { kgValue(Fmt.kg(store.settings.goal)) }
+            statTile(L("もくひょう")) { kgValue(Fmt.kg(store.settings.goal)).hiddenNumber() }
             statTile(L("あと")) {
                 if let left {
                     if left == 0 {
                         Text(L("達成！")).font(.ui(16)).foregroundStyle(Palette.mintInk)
                     } else {
-                        kgValue(Fmt.kg(left))
+                        kgValue(Fmt.kg(left)).hiddenNumber()
                     }
                 } else {
                     Text("—").font(.num(21, .bold))
@@ -238,7 +282,15 @@ struct RecordCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            CardTitle(L("きょうの体重"), note: L("まだ記録してないよ"))
+            CardTitle(title: L("きょうの体重")) {
+                HStack(spacing: 6) {
+                    Text(L("まだ記録してないよ")).font(.ui(12)).foregroundStyle(Palette.inkSoft).lineLimit(1).minimumScaleFactor(0.8)
+                    #if HEALTH_SYNC
+                    if store.settings.health { healthButton }
+                    #endif
+                }
+            }
+            if store.settings.game { GuessBox() }
             WeightStepper(value: $weight)
             HStack {
                 Text(L("きょうのこと")).font(.ui(12)).foregroundStyle(Palette.inkSoft)
@@ -279,6 +331,40 @@ struct RecordCard: View {
     }
 }
 
+#if HEALTH_SYNC
+private extension RecordCard {
+    /// .hkBtn
+    var healthButton: some View {
+        Button {
+            Task {
+                if let v = await store.readHealthWeight() { weight = min(200, max(20, v)) }
+            }
+        } label: {
+            HStack(spacing: 3) {
+                Image(systemName: "heart.fill").font(.system(size: 10))
+                Text(L("ヘルスケア")).font(.ui(11, .black)).lineLimit(1)
+            }
+            .foregroundStyle(Color(hex: 0xD9534F))
+            .padding(.vertical, 3).padding(.horizontal, 9)
+            .background(Capsule().fill(Color(hex: 0xFDECEC)))
+            .fixedSize()
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(L("ヘルスケアから体重を読みこむ"))
+    }
+}
+#endif
+
+/// アイコンと文字をつめて並べる（.shareBtn）
+struct ShareLabelStyle: LabelStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        HStack(spacing: 4) {
+            configuration.icon
+            configuration.title
+        }
+    }
+}
+
 // MARK: - もくひょうまで（.goalCard）
 
 struct GoalCard: View {
@@ -312,8 +398,11 @@ struct GoalCard: View {
         .card()
     }
 
-    private func trackLabel(_ label: String, _ value: String) -> Text {
-        Text("\(Text(num: label, size: 11, weight: .semibold).foregroundStyle(Palette.inkSoft))\(Text(num: value, size: 11, weight: .bold).foregroundStyle(Palette.ink))")
+    private func trackLabel(_ label: String, _ value: String) -> some View {
+        HStack(spacing: 0) {
+            Text(num: label, size: 11, weight: .semibold).foregroundStyle(Palette.inkSoft)
+            Text(num: value, size: 11, weight: .bold).foregroundStyle(Palette.ink).hiddenNumber()
+        }
     }
 
     /// .track（棒・目盛り・旗・走るキャラ）
@@ -379,18 +468,21 @@ struct GoalCard: View {
 
     private func cheerContent(_ info: GoalInfo?) -> (face: String, message: String, sub: String, band: Int) {
         guard let g = info else {
-            return ("cheer", L("はじめての記録が、スタート地点になるよ"), LF("もくひょうは %@kg。いっしょにがんばろうね", Fmt.kg(store.settings.goal)), -1)
+            return ("lg_cheer", L("はじめての記録が、スタート地点になるよ"), LF("もくひょうは %@kg。いっしょにがんばろうね", Fmt.kg(store.settings.goal)), -1)
         }
         let bands = CheerBand.all
         let band = g.pct <= 0 ? 0 : (bands.indices.first { $0 > 0 && g.pct < bands[$0].upTo } ?? bands.count - 1)
         let c = bands[band]
         let toHalf = max(0, g.latest - (g.start - g.span / 2))
+        let hide = store.settings.hideNumbers
         let message = c.lines[cheerIndex % c.lines.count]
             .replacingOccurrences(of: "{p}", with: "\(Int(floor(g.pct)))")
-            .replacingOccurrences(of: "{left}", with: Fmt.kg(g.left))
-            .replacingOccurrences(of: "{toHalf}", with: Fmt.kg(toHalf))
+            .replacingOccurrences(of: "{left}kg", with: hide ? L("もう少し") : "\(Fmt.kg(g.left))kg")
+            .replacingOccurrences(of: "{toHalf}kg", with: hide ? L("もう少し") : "\(Fmt.kg(toHalf))kg")
         let sub: String
-        if g.pct >= 100 {
+        if hide {
+            sub = L("数字はかくしているよ。このままのペースでいこうね")
+        } else if g.pct >= 100 {
             sub = LF("%1$@kg → %2$@kg、%3$@kg へったよ", Fmt.kg(g.start), Fmt.kg(g.latest), Fmt.kg(g.start - g.latest))
         } else if g.slope < -0.005 {
             let days = Int(ceil(g.left / -g.slope))
@@ -506,6 +598,7 @@ struct HistoryRow: View {
                 Text(diff.map { Fmt.signed($0) } ?? " ").font(.num(12, .bold)).foregroundStyle(deltaColor(diff))
                     .numLineHeight(1.1, size: 12)
             }
+            .hiddenNumber()
         }
         .padding(.vertical, 8)
         .contentShape(Rectangle())
@@ -514,8 +607,8 @@ struct HistoryRow: View {
     private func subline(entry: WeightEntry?, mood: Mood) -> some View {
         let tags = entry?.tags ?? []
         return HStack(spacing: 0) {
-            ForEach(tags, id: \.self) { t in
-                Text(L(t)).font(.ui(10)).foregroundStyle(Palette.ink)
+            ForEach((store.isTreat(date.adding(days: -1)) ? [L("🍰ごほうび")] : []) + tags.map { L($0) }, id: \.self) { t in
+                Text(t).font(.ui(10)).foregroundStyle(Palette.ink)
                     .padding(.horizontal, 5)
                     .background(RoundedRectangle(cornerRadius: 6).fill(Palette.blush))
                     .padding(.trailing, 3)
@@ -523,7 +616,7 @@ struct HistoryRow: View {
             if let memo = entry?.memo {
                 Text("📝\(memo)")
             } else if tags.isEmpty {
-                Text(mood.label + (entry?.fat.map { " ・ \(Fmt.kg($0))%" } ?? ""))
+                Text(mood.label + (store.settings.hideNumbers ? "" : entry?.fat.map { " ・ \(Fmt.kg($0))%" } ?? ""))
             }
         }
         .font(.ui(11))

@@ -5,7 +5,7 @@
 //  iCloud のキーバリューストアに、記録を預ける（ぽこりんの ICloudBackup と同じ考え方）。
 //  起動時・記録の保存時・ほかの端末で変わったときに、この端末の記録と iCloud の記録を合わせる。
 //
-//  預けるのは、体重の記録（体脂肪・タグ・メモ・きぶん）・ごほうび・キャラの名前。
+//  預けるのは、体重の記録（体脂肪・タグ・メモ・きぶん・よそう）・ごほうびの日・ごほうび・キャラの名前。
 //  せってい（身長・もくひょう・通知・表示）と、はじめての案内の既読は、この端末に残す。
 //
 
@@ -20,11 +20,13 @@ struct BackupData: Codable, Equatable {
     var earnedBadges: [String] = []
     var characterName = ""
     var nameUpdatedAt: Date?
+    var treats: [TreatMark] = []
 
     /// 2つの記録を合わせる。
     ///
     /// 同じ日の記録は、書きかえた時刻（または消した時刻）が新しいほうを残す。
     /// ごほうびは、いちど取ったら消えないよう両方を足し合わせる。名前は、あとで変えたほうを残す。
+    /// ごほうびの日は、日ごとに、あとで変えたほうを残す。
     static func merge(_ a: BackupData, _ b: BackupData) -> BackupData {
         let past = Date.distantPast
         var entries: [Date: WeightEntry] = [:]
@@ -56,7 +58,25 @@ struct BackupData: Codable, Equatable {
             out.characterName = a.characterName
             out.nameUpdatedAt = a.nameUpdatedAt
         }
+        var treats: [Date: TreatMark] = [:]
+        for t in a.treats + b.treats where (treats[t.date]?.updatedAt ?? past) < t.updatedAt {
+            treats[t.date] = t
+        }
+        out.treats = treats.values.sorted { $0.date < $1.date }
         return out
+    }
+}
+
+// 古いアプリが預けた中身も読めるようにする（読めないと空とみなして、合わせずに上書きしてしまうため）
+extension BackupData {
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        entries = try c.decodeIfPresent([WeightEntry].self, forKey: .entries) ?? []
+        deleted = try c.decodeIfPresent([DeletedEntry].self, forKey: .deleted) ?? []
+        earnedBadges = try c.decodeIfPresent([String].self, forKey: .earnedBadges) ?? []
+        characterName = try c.decodeIfPresent(String.self, forKey: .characterName) ?? ""
+        nameUpdatedAt = try c.decodeIfPresent(Date.self, forKey: .nameUpdatedAt)
+        treats = try c.decodeIfPresent([TreatMark].self, forKey: .treats) ?? []
     }
 }
 

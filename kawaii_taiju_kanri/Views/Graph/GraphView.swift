@@ -55,7 +55,7 @@ struct GraphView: View {
                 StatTile(label: L("へいきん"), value: Fmt.kg(avg), note: LF("%d日分のきろく", ws.count))
                 StatTile(label: L("この期間の変化"), value: Fmt.signed(ch), valueColor: deltaColor(ch), note: ch < 0 ? L("いい流れ！") : L("ここから巻き返そ"))
                 StatTile(label: L("いちばん軽い"), value: Fmt.kg(lo), note: ws.firstIndex(of: lo) == ws.count - 1 ? L("さいしんが最軽量！") : L("更新をめざそう"))
-                StatTile(label: L("いちばん重い"), value: Fmt.kg(hi), note: LF("差は %@kg", Fmt.kg(hi - lo)))
+                StatTile(label: L("いちばん重い"), value: Fmt.kg(hi), note: store.settings.hideNumbers ? L("数字はかくしているよ") : LF("差は %@kg", Fmt.kg(hi - lo)))
             }
             .coachTarget("graph.stats")
             .padding(.top, 14)
@@ -77,6 +77,7 @@ struct StatTile: View {
                 .font(.num(26, .bold))
                 .foregroundStyle(Palette.ink)
                 .numLineHeight(1.25, size: 26)
+                .hiddenNumber()
             Text(note).font(.ui(11)).foregroundStyle(Palette.inkSoft)
         }
         .padding(.vertical, 14).padding(.horizontal, 16)
@@ -103,7 +104,8 @@ struct BMICard: View {
                     Text(bmi.map { String(format: "%.1f", $0) } ?? "—")
                         .font(.num(40)).foregroundStyle(Palette.ink)
                         .numLineHeight(1, size: 40)
-                    Text(bmi == nil ? L("体重をきろくすると計算するよ") : LF("%1$@（最新 %2$@kg）", cat.label, Fmt.kg(latest ?? 0)))
+                        .hiddenNumber()
+                    Text(bmi == nil ? L("体重をきろくすると計算するよ") : store.settings.hideNumbers ? cat.label : LF("%1$@（最新 %2$@kg）", cat.label, Fmt.kg(latest ?? 0)))
                         .font(.ui(12)).foregroundStyle(Palette.mintInk)
                 }
                 Spacer(minLength: 0)
@@ -114,7 +116,7 @@ struct BMICard: View {
                 Text(L("体脂肪率（さいしん）")).font(.ui(13)).foregroundStyle(Palette.ink)
                 Spacer()
                 if let fat = latestFat {
-                    Text("\(Text(Fmt.kg(fat)).font(.num(17, .bold)))%").font(.ui(13)).foregroundStyle(Palette.ink)
+                    Text("\(Text(Fmt.kg(fat)).font(.num(17, .bold)))%").font(.ui(13)).foregroundStyle(Palette.ink).hiddenNumber()
                 } else {
                     Text("—").font(.ui(13)).foregroundStyle(Palette.ink)
                 }
@@ -271,7 +273,7 @@ struct CalendarCell: View {
         } else {
             Button { store.openDay(date, from: L("カレンダー")) } label: { cell(entry: entry) }
                 .buttonStyle(.plain)
-                .accessibilityLabel(entry.map { LF("%@ %@kg", Fmt.monthDay(date), Fmt.kg($0.weight)) } ?? LF("%@ 未記録", Fmt.monthDay(date)))
+                .accessibilityLabel(entry.map { store.settings.hideNumbers ? Fmt.monthDay(date) : LF("%@ %@kg", Fmt.monthDay(date), Fmt.kg($0.weight)) } ?? LF("%@ 未記録", Fmt.monthDay(date)))
         }
     }
 
@@ -284,6 +286,7 @@ struct CalendarCell: View {
                 Image(store.mood(for: date).smallAsset).resizable().scaledToFit().frame(width: 28, height: 28)
                 Text(Fmt.kg(entry.weight)).font(.num(10.5, .bold)).tracking(-0.21).foregroundStyle(Palette.ink)
                     .numLineHeight(1, size: 10.5)
+                    .hiddenNumber()
             }
         }
         .padding(.top, 4).padding(.bottom, 5)
@@ -293,6 +296,12 @@ struct CalendarCell: View {
         .overlay(alignment: .topTrailing) {
             if !(entry?.tags.isEmpty ?? true) {
                 Circle().fill(Palette.rose).frame(width: 6, height: 6).padding(4)
+            }
+        }
+        .overlay(alignment: .topLeading) {
+            if store.isTreat(date) {
+                Text("🍰").font(.system(size: 9)).padding(.top, 2).padding(.leading, 3)
+                    .accessibilityLabel(L("ごほうびの日"))
             }
         }
         .contentShape(Rectangle())

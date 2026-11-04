@@ -38,6 +38,22 @@ extension View {
     }
 }
 
+/// 見ないモードのとき、体重の数字をぼかす（.phone.hideNum）
+private struct HiddenNumber: ViewModifier {
+    @EnvironmentObject private var store: WeightStore
+
+    func body(content: Content) -> some View {
+        let hide = store.settings.hideNumbers
+        content
+            .blur(radius: hide ? 7 : 0)
+            .accessibilityHidden(hide)
+    }
+}
+
+extension View {
+    func hiddenNumber() -> some View { modifier(HiddenNumber()) }
+}
+
 /// .card h2（15px・900、右に小さな説明やボタン）
 struct CardTitle<Trailing: View>: View {
     let title: String
@@ -88,13 +104,24 @@ struct Hint: View {
 struct ScreenHeader<Trailing: View>: View {
     let caption: String
     let title: String
+    /// 見出しの右の小さなラベル（.hideBadge）
+    var badge: String?
     @ViewBuilder var trailing: Trailing
 
     var body: some View {
         HStack(alignment: .bottom) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(caption).font(.ui(13)).tracking(0.52).foregroundStyle(Palette.inkSoft)
-                Text(title).font(.ui(30, .black)).tracking(0.6).foregroundStyle(Palette.ink)
+                HStack(spacing: 6) {
+                    Text(title).font(.ui(30, .black)).tracking(0.6).foregroundStyle(Palette.ink)
+                    if let badge {
+                        Text(badge)
+                            .font(.ui(10, .black))
+                            .foregroundStyle(Palette.onInk)
+                            .padding(.vertical, 2).padding(.horizontal, 8)
+                            .background(Capsule().fill(Palette.ink))
+                    }
+                }
             }
             Spacer()
             trailing
@@ -415,10 +442,12 @@ struct WeightStepper: View {
     var range: ClosedRange<Double> = 20...200
     var unit = "kg"
 
+    @EnvironmentObject private var store: WeightStore
     @State private var text = ""
     @FocusState private var focused: Bool
 
     var body: some View {
+        let masked = store.settings.hideNumbers
         HStack(spacing: 8) {
             RoundStepButton(symbol: "−") { bump(-step) }
                 .accessibilityLabel(LF("%1$@%2$@ 減らす", Fmt.kg(step), unit))
@@ -433,7 +462,17 @@ struct WeightStepper: View {
                     .focused($focused)
                     .multilineTextAlignment(.center)
                     .font(.num(52, .heavy))
-                    .foregroundStyle(Palette.ink)
+                    // 見ないモードでは、数字のかわりに点を見せる（-webkit-text-security: disc）
+                    .foregroundStyle(masked ? .clear : Palette.ink)
+                    .overlay {
+                        if masked {
+                            Text(String(repeating: "•", count: text.count))
+                                .font(.num(52, .heavy))
+                                .foregroundStyle(Palette.ink)
+                                .allowsHitTesting(false)
+                                .accessibilityHidden(true)
+                        }
+                    }
                     .frame(width: 170)
                     .numLineHeight(1.1, size: 52)
                     .accessibilityLabel(LF("体重 (%@)", unit))

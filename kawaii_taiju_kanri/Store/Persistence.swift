@@ -17,6 +17,10 @@ struct SavedData: Codable {
     var deleted: [DeletedEntry] = []
     /// キャラの名前を最後に変えた時刻（iCloud バックアップ用）
     var nameUpdatedAt: Date?
+    /// ごほうびの日の印（iCloud バックアップにも預ける）
+    var treats: [TreatMark] = []
+    /// 記録の前にしたよそう
+    var pendingGuess: PendingGuess?
 }
 
 enum Persistence {
@@ -65,5 +69,7 @@ extension SavedData {
         onboarded = try c.decodeIfPresent(Bool.self, forKey: .onboarded) ?? false
         deleted = try c.decodeIfPresent([DeletedEntry].self, forKey: .deleted) ?? []
         nameUpdatedAt = try c.decodeIfPresent(Date.self, forKey: .nameUpdatedAt)
+        treats = try c.decodeIfPresent([TreatMark].self, forKey: .treats) ?? []
+        pendingGuess = try c.decodeIfPresent(PendingGuess.self, forKey: .pendingGuess)
     }
 }

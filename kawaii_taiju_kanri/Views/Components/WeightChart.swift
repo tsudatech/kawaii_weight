@@ -52,7 +52,9 @@ struct WeightChart: View {
     private var drawing: ChartDrawing {
         let today = Date.today
         let todayLabel = L("きょう")
+        let goalLabel = L("もくひょう")
         let W: CGFloat = 320, L: CGFloat = 34, R: CGFloat = 10, T: CGFloat = 16, B: CGFloat = 26, H = height
+        let hide = store.settings.hideNumbers
         var d = ChartDrawing(H: H)
         let pts: [(i: Int, w: Double, date: Date)] = (0..<range).reversed().compactMap { ago in
             let date = today.adding(days: -ago)
@@ -73,7 +75,7 @@ struct WeightChart: View {
         d.gridTo = W - R
         for v in stride(from: lo, through: hi, by: step) {
             d.grid.append(y(v))
-            d.labels.append(.init(text: "\(Int(v))", at: CGPoint(x: L - 6, y: y(v) + 4), anchor: 1))
+            if !hide { d.labels.append(.init(text: "\(Int(v))", at: CGPoint(x: L - 6, y: y(v) + 4), anchor: 1)) }
         }
         let mid = Int((Double(range - 1) / 2).rounded())
         for (i, ago) in [(0, range - 1), (mid, range - 1 - mid), (range - 1, 0)] {
@@ -85,7 +87,7 @@ struct WeightChart: View {
             ))
         }
         d.goalY = y(goal)
-        d.labels.append(.init(text: LF("もくひょう %@", Fmt.kg(goal)), at: CGPoint(x: W - R, y: y(goal) - 6), anchor: 1, color: Palette.mintInk))
+        d.labels.append(.init(text: hide ? goalLabel : LF("もくひょう %@", Fmt.kg(goal)), at: CGPoint(x: W - R, y: y(goal) - 6), anchor: 1, color: Palette.mintInk))
         d.line = pts.map { CGPoint(x: x($0.i), y: y($0.w)) }
         d.areaBottom = H - B
         d.lineWidth = range > 40 ? 2.4 : 3
@@ -100,7 +102,7 @@ struct WeightChart: View {
             let r: CGFloat = end ? 6 : range > 20 ? 0 : 2.8
             if r > 0 { d.dots.append((CGPoint(x: x(p.i), y: y(p.w)), r, end)) }
         }
-        if let e = pts.last {
+        if !hide, let e = pts.last {
             d.labels.append(.init(text: Fmt.kg(e.w), at: CGPoint(x: min(x(e.i), W - R - 4), y: y(e.w) - 12), anchor: 1, size: 13, weight: .bold, color: Palette.ink))
         }
         return d
@@ -120,6 +122,7 @@ struct WeekChart: View {
     private var drawing: ChartDrawing {
         let centerLabel = L("この日")
         let W: CGFloat = 320, H: CGFloat = 150, L: CGFloat = 30, R: CGFloat = 12, T: CGFloat = 18, B: CGFloat = 24
+        let hide = store.settings.hideNumbers
         var d = ChartDrawing(H: H)
         let pts: [(o: Int, w: Double)] = (-7...7).compactMap { o in
             store.entries[center.adding(days: o)].map { (o, $0.weight) }
@@ -133,7 +136,7 @@ struct WeekChart: View {
         d.gridTo = W - R
         for v in stride(from: lo, through: hi, by: hi - lo > 4 ? 2 : 1) {
             d.grid.append(y(v))
-            d.labels.append(.init(text: "\(Int(v))", at: CGPoint(x: L - 6, y: y(v) + 4), anchor: 1))
+            if !hide { d.labels.append(.init(text: "\(Int(v))", at: CGPoint(x: L - 6, y: y(v) + 4), anchor: 1)) }
         }
         d.labels.append(.init(text: Fmt.slash(center.adding(days: -7)), at: CGPoint(x: x(-7), y: H - 6), anchor: -1))
         d.labels.append(.init(text: Fmt.slash(center.adding(days: 7)), at: CGPoint(x: x(7), y: H - 6), anchor: 1))

@@ -103,11 +103,24 @@ struct DayDetailView: View {
                 Text("kg").font(.ui(16)).foregroundStyle(Palette.inkSoft)
             }
             .foregroundStyle(Palette.ink)
+            .hiddenNumber()
             .padding(.top, 4)
-            Text([face.mood.label, entry.fat.map { LF("体脂肪 %@%%", Fmt.kg($0)) }].compactMap { $0 }.joined(separator: L(" ・ ")))
+            Text([face.mood.label, store.settings.hideNumbers ? nil : entry.fat.map { LF("体脂肪 %@%%", Fmt.kg($0)) }].compactMap { $0 }.joined(separator: L(" ・ ")))
                 .font(.ui(12))
                 .foregroundStyle(Palette.inkSoft)
                 .padding(.top, 4)
+            // .dShare
+            Button { store.sharingDate = date } label: {
+                Label(L("この日をカードにしてシェア"), systemImage: "square.and.arrow.up")
+                    .labelStyle(ShareLabelStyle())
+                    .font(.ui(12, .black))
+                    .foregroundStyle(Palette.rose)
+                    .padding(.vertical, 5).padding(.horizontal, 12)
+                    .background(Capsule().fill(Palette.card))
+                    .overlay(Capsule().strokeBorder(Palette.cheek, lineWidth: 2))
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 10)
         }
         .padding(.top, 18).padding(.horizontal, 16).padding(.bottom, 16)
         .frame(maxWidth: .infinity)
@@ -124,13 +137,13 @@ struct DayDetailView: View {
         let avgDiff = store.average7(before: date).map { ((entry.weight - $0) * 10).rounded() / 10 }
         let left = entry.weight - store.settings.goal
         return HStack(spacing: 8) {
-            metric(prevLabel) { diffValue(prevDiff) }
-            metric(L("7日平均から")) { diffValue(avgDiff) }
+            metric(prevLabel) { diffValue(prevDiff).hiddenNumber() }
+            metric(L("7日平均から")) { diffValue(avgDiff).hiddenNumber() }
             metric(L("もくひょうまで")) {
                 if left <= 0 {
                     Text(L("達成！")).font(.ui(15)).foregroundStyle(Palette.mintInk)
                 } else {
-                    Text("\(Text(Fmt.kg(left)).font(.num(19, .bold)))\(Text("kg").font(.num(11, .bold)))").foregroundStyle(Palette.ink)
+                    Text("\(Text(Fmt.kg(left)).font(.num(19, .bold)))\(Text("kg").font(.num(11, .bold)))").foregroundStyle(Palette.ink).hiddenNumber()
                 }
             }
         }
@@ -176,8 +189,26 @@ struct DayDetailView: View {
                 Text(L("タグもメモもない日だよ。「編集」から書きこめるよ"))
                     .font(.ui(13)).foregroundStyle(Palette.inkSoft).lineHeight(1.6, size: 13)
             }
+            if let note = dayNote {
+                Text(note).font(.ui(12)).foregroundStyle(Palette.inkSoft).lineHeight(1.6, size: 12).padding(.top, 8)
+            }
         }
         .card()
+    }
+
+    /// .dGuess（ごほうびの日・よそうの結果）
+    private var dayNote: String? {
+        var parts: [String] = []
+        if store.isTreat(date.adding(days: -1)) {
+            parts.append(L("🍰 まえの日は ごほうびの日"))
+        } else if store.isTreat(date) {
+            parts.append(L("🍰 この日は ごほうびの日"))
+        }
+        if store.settings.game, let g = store.guessResult(date) {
+            let result = g.hit ? LF("あたり！+%dpt", g.points) : L("はずれ")
+            parts.append(LF("よそう「%1$@」→ %2$@（キャラは「%3$@」）", g.guess.label, result, g.bot.label))
+        }
+        return parts.isEmpty ? nil : parts.joined(separator: "　")
     }
 
     /// .dPN
@@ -204,7 +235,7 @@ struct DayDetailView: View {
                     let face = Image(store.mood(for: d).smallAsset).resizable().scaledToFit().frame(width: 34, height: 34)
                     let txt = VStack(alignment: forward ? .trailing : .leading, spacing: 0) {
                         Text(Fmt.slash(d))
-                        Text(Fmt.kg(e.weight)).font(.num(15, .bold))
+                        Text(Fmt.kg(e.weight)).font(.num(15, .bold)).hiddenNumber()
                     }
                     if forward {
                         Spacer(minLength: 0)
