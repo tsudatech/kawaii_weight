@@ -2,3 +2,4 @@
 "CFBundleName" = "Taikan!";
 "NSUserTrackingUsageDescription" = "This is used to show ads that are more relevant to you. Your weight logs are never used.";
 "NSPhotoLibraryAddUsageDescription" = "Used to save your shareable weight card to Photos.";
+"NSFaceIDUsageDescription" = "Used to confirm it’s you with Face ID when you open the app.";

@@ -50,11 +50,26 @@ SwiftUI の iPhone アプリ ＋ ホーム画面ウィジェット（`KawaiiWidg
 - ごほうびの日：`WeightStore.treats`・`treatHit`（その日と翌日）。増えても `cozy` で受け止める。
 - 体重よそう（せっていでオンにした人だけ）：記録の前は `pendingGuess`、記録したら `WeightEntry.guess` / `bot` に移す。記録シートは前のよそうを残す（`WeightStore.save`）。
 - 見ないモード（`settings.hideNumbers`）：体重の数字には `.hiddenNumber()` を付ける。**数字を出す画面を足したら忘れないこと。** 数字を文に入れるときは、かくすときの文言も用意する。ウィジェットはぼかさず「••.•」に置きかえる。
+  アプリの画面では `store.hidesNumbers`（見ないモード、ただし長押しのあいだは false）を見る。せっていの値そのものは `settings.hideNumbers`、ウィジェット・Siri は `settings.hidesNumbersOutside`（ロック中もかくす）。
+  ぼかした数字を長押ししているあいだは、画面の数字をぜんぶ見せる（`.peekNumbers()`・`WeightStore.peekingNumbers`）。
+  ボタンの中の数字は `.hiddenNumber(peek: false)` にしてボタンのほうに `.peekNumbers()` をつけ、ボタンの処理は `store.justPeeked` なら何もしない（中の部品に長押しをつけるとタップが効かなくなり、長押しのあとにはボタンが押されたことになるため）。
+  長押しは UIKit の `UILongPressGestureRecognizer`（`PeekPress`・ほかの動きと同時に見る）。SwiftUI の LongPressGesture＋DragGesture にすると、りれきなどの上からスクロールできなくなる。
 - シェア（`Views/Share/ShareCardView.swift`）：`ImageRenderer` で 1080×1350 の画像を作り、`ShareLink` で共有メニューへ。数字は「のせる」を選んだときだけ。
 - ヘルスケア（`Store/HealthSync.swift`）：**いまの提出には入れていない**（iCloud バックアップと併存すると、ガイドライン 5.1.3 に触れるおそれがあるため）。コードは `#if HEALTH_SYNC` で残してある。
   もどすときは、コンパイル条件 `HEALTH_SYNC` を定義し、`com.apple.developer.healthkit`（entitlements）と `NSHealthShareUsageDescription` / `NSHealthUpdateUsageDescription`（pbxproj の INFOPLIST_KEY・InfoPlist.strings）を足す。紹介ページ・掲載情報・審査メモ・UI テストも直す。データは広告に渡さない。
 - ロック画面（`KawaiiWidget/LockScreenWidgets.swift`）：表情・7日平均・もくひょう％と、「体重をきろく」のコントロール（`Shared/OpenRecordIntent.swift`。アプリを開いて入力へ）。
 - Siri・ショートカット（`Intents/WeightIntents.swift`）：言いかたは `{ja,en}.lproj/AppShortcuts.strings`。アプリ名を入れた言いかたしか登録できないので「たいかん！で体重をきろく」→ 何キロかを聞く、の流れ。
+
+## アプリのロック（Face ID・`Store/AppLock.swift`）
+
+- かわいい日記（kawaiidiary）の AppLockService と同じ考え方。せってい › ロック でオン（`AppSettings.appLock`・端末ごと）。
+  オン・オフどちらに切りかえるときも、先に本人か確かめる。確かめかたは `.deviceOwnerAuthentication`（Face ID がだめならパスコード）。
+- 背景に回ったら（`.background`）ロックし、前面に戻ったら1回だけ自動で確かめる。非アクティブではロックしない（確かめるダイアログで非アクティブになるため）。
+- ロック画面は別の `UIWindow`（`.alert + 1`）に出す。シェアのメニュー・確認ダイアログ・全画面広告の上にもかぶせるため。
+  RootView にも、窓が出るまでのあいだ中身をかくす覆いがある。ロック中は広告の同意（UMP・ATT）を始めない。
+- オンのあいだは、ウィジェットと Siri でも体重の数字を出さない（`AppSettings.hidesNumbersOutside`）。
+- 端末のパスコードを外して確かめる手段がなくなったら、閉め出さないようにそのまま開ける。
+- Info.plist の `NSFaceIDUsageDescription` は pbxproj の INFOPLIST_KEY と `{ja,en}.lproj/InfoPlist.strings`。
 
 ## 広告（Google AdMob・`kawaii_taiju_kanri/Ads/`）
 

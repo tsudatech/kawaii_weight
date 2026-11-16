@@ -2,3 +2,4 @@
 "CFBundleName" = "たいかん！";
 "NSUserTrackingUsageDescription" = "あなたに合った広告を表示するために使います。体重の記録は使いません。";
 "NSPhotoLibraryAddUsageDescription" = "シェア用の体重カードを写真に保存するために使います。";
+"NSFaceIDUsageDescription" = "アプリを開くときに、Face ID で本人か確かめるために使います。";

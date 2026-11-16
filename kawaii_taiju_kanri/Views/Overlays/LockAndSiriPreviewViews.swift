@@ -134,7 +134,7 @@ struct LockPreviewView: View {
         VStack(alignment: .leading, spacing: 0) {
             Text(L("7日平均")).font(.ui(10)).opacity(0.85)
             Group {
-                if store.settings.hideNumbers {
+                if store.hidesNumbers {
                     Text(verbatim: "••.•").font(.num(24))
                 } else {
                     Text("\(Text(store.recentAverage.map { Fmt.kg($0) } ?? "—").font(.num(24)))\(Text("kg").font(.num(11)))")
@@ -150,7 +150,7 @@ struct LockPreviewView: View {
 
     private var subline: String {
         guard let e = store.todayEntry else { return L("タップしてきろく") }
-        return store.settings.hideNumbers ? L("きょうも記録したよ") : LF("きょう %@kg", Fmt.kg(e.weight))
+        return store.hidesNumbers ? L("きょうも記録したよ") : LF("きょう %@kg", Fmt.kg(e.weight))
     }
 
     private func circle<C: View>(@ViewBuilder _ content: () -> C) -> some View {
@@ -177,7 +177,7 @@ struct SiriPreviewView: View {
         let v = ((store.lastWeightOrDefault - 0.3) * 10).rounded() / 10
         let d = store.average7(before: .today).map { ((v - $0) * 10).rounded() / 10 } ?? 0
         let mood: Mood = d < -0.1 ? .happy : d <= 0.1 ? .good : .trouble
-        let hide = store.settings.hideNumbers
+        let hide = store.hidesNumbers
         VStack(spacing: 0) {
             Spacer(minLength: 12)
             VStack(spacing: 0) {

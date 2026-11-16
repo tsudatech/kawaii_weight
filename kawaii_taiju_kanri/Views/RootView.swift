@@ -17,6 +17,7 @@ extension Animation {
 struct RootView: View {
     @EnvironmentObject private var store: WeightStore
     @ObservedObject private var ads = AdService.shared
+    @ObservedObject private var lock = AppLock.shared
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
@@ -113,6 +114,10 @@ struct RootView: View {
                     .ignoresSafeArea()
                     .zIndex(15)
             }
+            // ロック中は中身を見せない（ロック画面そのものは AppLock の窓。窓が出るまでのあいだもかくす）
+            if lock.isLocked {
+                Palette.paper.ignoresSafeArea().zIndex(100)
+            }
         }
         // はじめての案内（コーチマーク）。部品の位置は .coachTarget(_:) の印から
         .overlayPreferenceValue(CoachTargetKey.self) { anchors in
@@ -155,6 +160,7 @@ struct RootView: View {
             PreviewTour.prepare(store)
             #endif
             if !store.onboarded { store.showOnboarding = true }
+            AppLock.shared.attach()
         }
         #if DEBUG
         .task { await PreviewTour.run(store) }
@@ -176,7 +182,7 @@ struct RootView: View {
     // MARK: - はじめての案内
 
     private var canStartAds: Bool {
-        store.onboarded && !store.showOnboarding && store.coach == nil && !Onboarding.needs(.home)
+        store.onboarded && !store.showOnboarding && store.coach == nil && !Onboarding.needs(.home) && !lock.isLocked
     }
 
     /// これが変わるたびに、案内を出せるか見なおす

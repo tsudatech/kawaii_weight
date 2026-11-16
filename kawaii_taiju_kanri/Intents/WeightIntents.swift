@@ -27,7 +27,7 @@ struct RecordWeightIntent: AppIntent {
         store.saveToday(weight: weight, tags: store.todayEntry?.tags ?? [])
         store.saveNow()
         let saved = store.todayEntry?.weight ?? weight
-        let hide = store.settings.hideNumbers
+        let hide = store.settings.hidesNumbersOutside
         let title = hide ? L("きろくしたよ！") : LF("%@kg をきろくしたよ！", Fmt.kg(saved))
         let diff = store.average7(before: .today).map { ((saved - $0) * 10).rounded() / 10 }
         let sub = diff.map { SiriPreviewView.reply(diff: $0, hide: hide) } ?? L("はじめての記録だよ")
@@ -49,7 +49,7 @@ struct TodayWeightIntent: AppIntent {
         let store = WeightStore.shared
         let text: String
         if let e = store.todayEntry {
-            text = store.settings.hideNumbers ? L("きょうも記録したよ") : LF("きょう %@kg", Fmt.kg(e.weight))
+            text = store.settings.hidesNumbersOutside ? L("きょうも記録したよ") : LF("きょう %@kg", Fmt.kg(e.weight))
         } else {
             text = L("まだはかってないよ")
         }
@@ -67,7 +67,7 @@ struct AverageWeightIntent: AppIntent {
     func perform() async throws -> some IntentResult & ProvidesDialog {
         let store = WeightStore.shared
         let text: String
-        if store.settings.hideNumbers {
+        if store.settings.hidesNumbersOutside {
             text = L("数字はかくしているよ")
         } else if let avg = store.recentAverage {
             text = LF("7日平均は %@kg だよ", Fmt.kg(avg))

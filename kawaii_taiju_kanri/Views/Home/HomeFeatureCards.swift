@@ -38,7 +38,7 @@ struct GuessBox: View {
         let name = previous.days(to: .today) == 1 ? L("きのう") : Fmt.slash(previous)
         return HStack(spacing: 2) {
             Text(LF("%@より", name))
-            if !store.settings.hideNumbers, let w = store.entries[previous]?.weight {
+            if !store.hidesNumbers, let w = store.entries[previous]?.weight {
                 Text(Fmt.kg(w)).font(.num(10, .bold))
             }
         }
@@ -174,7 +174,7 @@ struct WatchCard: View {
             content(
                 since: LF("%1$@から %2$d日目", Fmt.slash(a.start), a.start.days(to: .today) + 1),
                 title: LF("%@のもやもや", L(a.label)),
-                sub: store.settings.hideNumbers
+                sub: store.hidesNumbers
                     ? L("もとの体重にもどったら はれるよ。いっしょに見守ってるね")
                     : LF("もとの %1$@kg にもどったら はれるよ（あと %2$@kg）", Fmt.kg(a.base), Fmt.kg(left)),
                 progress: max(0.06, progress), clear: false

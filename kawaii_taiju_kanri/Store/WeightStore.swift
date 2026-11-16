@@ -27,6 +27,24 @@ final class WeightStore: ObservableObject {
         }
     }
     @Published var settings = AppSettings() { didSet { scheduleSave() } }
+    /// 見ないモードで、ぼかした数字を長押ししているあいだ（そのあいだだけ数字を見せる）
+    @Published private(set) var peekingNumbers = false
+    /// アプリの画面で、いま体重の数字をかくすか（見ないモード・長押しのあいだは見せる）。
+    /// ウィジェット・Siri は settings.hidesNumbersOutside を見る
+    var hidesNumbers: Bool { settings.hideNumbers && !peekingNumbers }
+
+    func setPeekingNumbers(_ on: Bool) {
+        let on = on && settings.hideNumbers
+        guard on != peekingNumbers else { return }
+        peekingNumbers = on
+        if on { UIImpactFeedbackGenerator(style: .light).impactOccurred() } else { peekEndedAt = .now }
+    }
+
+    private var peekEndedAt = Date.distantPast
+    /// 長押しで数字を見て、指をはなした直後か。数字はボタン（りれき・カレンダーの日など）の中にもあるので、
+    /// はなしたときにボタンが押されたことになっても、日の詳細を開かないようにする
+    /// （指をはなしたとき、ボタンのタップのほうが長押しの終わりより先に届くので、見ている最中も含める）
+    var justPeeked: Bool { peekingNumbers || Date.now.timeIntervalSince(peekEndedAt) < 0.5 }
     @Published var characterName = "" {
         didSet {
             if !applyingBackup && characterName != oldValue { nameUpdatedAt = Self.stamp() }
@@ -120,6 +138,7 @@ final class WeightStore: ObservableObject {
 
     /// 記録がある日は日の詳細を、ない日は入力シートを開く
     func openDay(_ date: Date, from: String) {
+        guard !justPeeked else { return }
         guard entries[date] != nil else {
             editing = SheetTarget(date: date)
             return
@@ -261,7 +280,7 @@ final class WeightStore: ObservableObject {
             recentWeights: points(lastDays: 7).map(\.weight),
             average7: recentAverage,
             goalPct: goalInfo().map { max(0, min(100, $0.pct)) },
-            hideNumbers: settings.hideNumbers
+            hideNumbers: settings.hidesNumbersOutside
         ).save()
         WidgetCenter.shared.reloadAllTimelines()
 

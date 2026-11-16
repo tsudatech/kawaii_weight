@@ -8,12 +8,26 @@
 //  流れ：ホーム（体重を入れて「きろくする」→ もやもやがはれて紙ふぶき）→ ごほうびの日せんげん → 見ないモード
 //       → シェアカード → グラフ（3か月）→ キャラ（はらしたもやもや）→ ロック画面 → Siri
 //
+//  スクリーンショット用に、流れを進めずに1つの場面で止める起動引数 `--preview-shot <名前>` もある。
+//    hidden-home  … 見ないモードのホーム（きょうはまだ記録していない。7日平均・もくひょう・あと・入力欄がぼかし）
+//    hidden-graph … 見ないモードのグラフ
+//    lock          … Face ID のロック画面（確かめるダイアログは出さない）
+//    lock-settings … ロックをオンにした、せっていのタブ
+//  どちらも見本の記録は保存しない（--preview-tour と同じ）。
+//
 
 import SwiftUI
 
 #if DEBUG
 enum PreviewTour {
-    static var isOn: Bool { ProcessInfo.processInfo.arguments.contains("--preview-tour") }
+    static var isOn: Bool { ProcessInfo.processInfo.arguments.contains("--preview-tour") || shot != nil }
+
+    /// `--preview-shot <名前>`。スクリーンショット用に、1つの場面で止める
+    static var shot: String? {
+        let args = ProcessInfo.processInfo.arguments
+        guard let i = args.firstIndex(of: "--preview-shot"), i + 1 < args.count else { return nil }
+        return args[i + 1]
+    }
 
     /// きょうの体重のカードを動かす（RecordCard が受ける）
     static let bump = Notification.Name("previewTour.bump")
@@ -31,6 +45,27 @@ enum PreviewTour {
         store.showOnboarding = false
         store.selectedTab = .home
         setUpWatch(store)
+        switch shot {
+        case "hidden-home":
+            // きょうはまだ記録していない状態。上のカードに7日平均・もくひょう・あとの数字がぼかしで並ぶ
+            store.settings.hideNumbers = true
+        case "lock":
+            store.settings.appLock = true
+            AppLock.shared.showForPreview()
+        case "lock-settings":
+            // ロックはオンの表示だけ（ロック画面は出さない）
+            store.settings.appLock = true
+            store.selectedTab = .settings
+        case "hidden-graph":
+            // きょうも記録して、グラフの最後をきょうまでつなぐ
+            if let last = store.latestWeight {
+                store.saveToday(weight: ((last - 0.2) * 10).rounded() / 10, tags: ["運動した"])
+            }
+            store.settings.hideNumbers = true
+            store.selectedTab = .graph
+        default:
+            break
+        }
     }
 
     /// 3日前の飲み会から増えていて、きょう −ボタンを8回押した体重でちょうど「もやもやがはれる」見本にする
@@ -45,7 +80,7 @@ enum PreviewTour {
     }
 
     static func run(_ store: WeightStore) async {
-        guard isOn else { return }
+        guard isOn, shot == nil else { return }
         let post = { (name: Notification.Name, object: Any?) in NotificationCenter.default.post(name: name, object: object) }
 
         // ホーム：まだはかっていない（ねむい）→ 体重を入れて記録 → もやもやがはれて紙ふぶき

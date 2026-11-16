@@ -54,7 +54,7 @@ struct WeightChart: View {
         let todayLabel = L("きょう")
         let goalLabel = L("もくひょう")
         let W: CGFloat = 320, L: CGFloat = 34, R: CGFloat = 10, T: CGFloat = 16, B: CGFloat = 26, H = height
-        let hide = store.settings.hideNumbers
+        let hide = store.hidesNumbers
         var d = ChartDrawing(H: H)
         let pts: [(i: Int, w: Double, date: Date)] = (0..<range).reversed().compactMap { ago in
             let date = today.adding(days: -ago)
@@ -122,7 +122,7 @@ struct WeekChart: View {
     private var drawing: ChartDrawing {
         let centerLabel = L("この日")
         let W: CGFloat = 320, H: CGFloat = 150, L: CGFloat = 30, R: CGFloat = 12, T: CGFloat = 18, B: CGFloat = 24
-        let hide = store.settings.hideNumbers
+        let hide = store.hidesNumbers
         var d = ChartDrawing(H: H)
         let pts: [(o: Int, w: Double)] = (-7...7).compactMap { o in
             store.entries[center.adding(days: o)].map { (o, $0.weight) }

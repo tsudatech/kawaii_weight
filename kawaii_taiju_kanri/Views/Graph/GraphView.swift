@@ -55,7 +55,7 @@ struct GraphView: View {
                 StatTile(label: L("へいきん"), value: Fmt.kg(avg), note: LF("%d日分のきろく", ws.count))
                 StatTile(label: L("この期間の変化"), value: Fmt.signed(ch), valueColor: deltaColor(ch), note: ch < 0 ? L("いい流れ！") : L("ここから巻き返そ"))
                 StatTile(label: L("いちばん軽い"), value: Fmt.kg(lo), note: ws.firstIndex(of: lo) == ws.count - 1 ? L("さいしんが最軽量！") : L("更新をめざそう"))
-                StatTile(label: L("いちばん重い"), value: Fmt.kg(hi), note: store.settings.hideNumbers ? L("数字はかくしているよ") : LF("差は %@kg", Fmt.kg(hi - lo)))
+                StatTile(label: L("いちばん重い"), value: Fmt.kg(hi), note: store.hidesNumbers ? L("数字はかくしているよ") : LF("差は %@kg", Fmt.kg(hi - lo)))
             }
             .coachTarget("graph.stats")
             .padding(.top, 14)
@@ -105,7 +105,7 @@ struct BMICard: View {
                         .font(.num(40)).foregroundStyle(Palette.ink)
                         .numLineHeight(1, size: 40)
                         .hiddenNumber()
-                    Text(bmi == nil ? L("体重をきろくすると計算するよ") : store.settings.hideNumbers ? cat.label : LF("%1$@（最新 %2$@kg）", cat.label, Fmt.kg(latest ?? 0)))
+                    Text(bmi == nil ? L("体重をきろくすると計算するよ") : store.hidesNumbers ? cat.label : LF("%1$@（最新 %2$@kg）", cat.label, Fmt.kg(latest ?? 0)))
                         .font(.ui(12)).foregroundStyle(Palette.mintInk)
                 }
                 Spacer(minLength: 0)
@@ -273,7 +273,8 @@ struct CalendarCell: View {
         } else {
             Button { store.openDay(date, from: L("カレンダー")) } label: { cell(entry: entry) }
                 .buttonStyle(.plain)
-                .accessibilityLabel(entry.map { store.settings.hideNumbers ? Fmt.monthDay(date) : LF("%@ %@kg", Fmt.monthDay(date), Fmt.kg($0.weight)) } ?? LF("%@ 未記録", Fmt.monthDay(date)))
+                .peekNumbers()
+                .accessibilityLabel(entry.map { store.hidesNumbers ? Fmt.monthDay(date) : LF("%@ %@kg", Fmt.monthDay(date), Fmt.kg($0.weight)) } ?? LF("%@ 未記録", Fmt.monthDay(date)))
         }
     }
 
@@ -286,7 +287,7 @@ struct CalendarCell: View {
                 Image(store.mood(for: date).smallAsset).resizable().scaledToFit().frame(width: 28, height: 28)
                 Text(Fmt.kg(entry.weight)).font(.num(10.5, .bold)).tracking(-0.21).foregroundStyle(Palette.ink)
                     .numLineHeight(1, size: 10.5)
-                    .hiddenNumber()
+                    .hiddenNumber(peek: false)  // 長押しは日のボタンのほう
             }
         }
         .padding(.top, 4).padding(.bottom, 5)

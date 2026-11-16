@@ -26,12 +26,14 @@ App Store Connect にそのまま貼れる形でまとめています。コー�
 | もどるまで見守り                         | サブタイトル、プロモ、概要、スクショ01、審査メモ | ☑    | 実機の UI テストで通過                           |
 | ごほうびの日せんげん                     | プロモ、概要、スクショ02、審査メモ               | ☑    | 実機の UI テストで通過                           |
 | 見ないモード                             | プロモ、概要、スクショ03、審査メモ               | ☑    | 実機の UI テストで通過                           |
+| 見ないモードの長押し（そのあいだだけ見る） | 概要                                           | ☑    | シミュレータで確認。☐ 実機で触り心地を確認       |
+| Face ID でロック（初期オフ）             | 概要、キーワード                                 | ☑    | シミュレータで確認。☐ 実機で確認                 |
 | シェアカード                             | 概要、スクショ05                                 | ☑    | 実機の UI テストでカードの表示まで               |
 | ホーム画面ウィジェット                   | 概要、スクショ07                                 | ☑    | ☐ 実機で確認                                     |
 | ロック画面ウィジェット・記録コントロール | 概要、スクショ08                                 | ☑    | ☐ 実機で確認                                     |
 | Siri・ショートカット                     | 概要、スクショ08                                 | ☑    | ☐ 実機で確認                                     |
 | 体重よそう（初期オフ）                   | 概要                                             | ☑    | シミュレータで確認                               |
-| ハムスターの新キャラ・新アイコン         | スクショ全部、アイコン                           | ☑    | スクショ 01・03・05・08 は差し替えが必要（§8）   |
+| ハムスターの新キャラ・新アイコン         | スクショ全部、アイコン                           | ☑    | スクショ 01・05・08 は差し替えが必要（§8）       |
 
 ヘルスケア（HealthKit）連携は入れません。概要・キーワード・審査メモ・スクリーンショットにも書いていません。
 
@@ -45,7 +47,7 @@ App Store Connect にそのまま貼れる形でまとめています。コー�
 | 文字数                 | 24 / 30                                                         | 29 / 30                                          |
 | サブタイトル           | 増えても、もどるまで見守る体重記録                              | Up a bit? Buddy waits with you                   |
 | 文字数                 | 17 / 30                                                         | 30 / 30                                          |
-| キーワード文字数       | 95 / 100                                                        | 99 / 100                                         |
+| キーワード文字数       | 99 / 100                                                        | 99 / 100                                         |
 | プロモーションテキスト | 100 / 170                                                       | 153 / 170                                        |
 | カテゴリ               | 主: ヘルスケア／フィットネス / 副: ライフスタイル               | Primary: Health & Fitness / Secondary: Lifestyle |
 | 年齢レーティング       | 4+                                                              | 4+                                               |
@@ -172,7 +174,7 @@ Up after a night out? Buddy watches with you until you are back. Plan treat days
 ■ 見ないモード
 体重の数字を見るのがつらい日に。
 数字とグラフの目もりをかくして、「きろくしたよ」「いい流れだよ」と、キャラの表情とことばだけで伝えます。
-記録はいつもどおりできます。
+記録はいつもどおりできます。見たいときは、ぼかした数字を長押ししているあいだだけ見られます。
 
 ■ 体重にあわせて、14の表情
 前の7日の平均とくらべて、キャラの表情が変わります。
@@ -208,6 +210,7 @@ Up after a night out? Buddy watches with you until you are back. Plan treat days
 ■ 安心して使える
 ・アカウント登録なし。インストールしてすぐ始められます
 ・記録は端末の中に保存。開発者のサーバーには送りません
+・Face ID でロックできます。オンのあいだは、ウィジェットと Siri でも体重の数字を出しません
 ・iCloud に預けておけば、機種変更しても続きから（使うかどうかは選べます）
 ・CSV で書き出せます
 ・日本語と英語に対応
@@ -215,7 +218,7 @@ Up after a night out? Buddy watches with you until you are back. Plan treat days
 ※ 本アプリは体重の記録とふりかえりのためのものです。医療上の診断や助言は行いません。BMI やキャラのセリフは目安としてご利用ください。
 ```
 
-1418文字。
+1503文字。
 
 ### English (U.S.)
 
@@ -238,7 +241,7 @@ Plan your treat days without guilt.
 ■ Hide my weight
 For days when seeing the number is hard.
 Hide your weight and the graph scale, and Buddy tells you how it's going in words: "Logged" "Going well"
-You can log just like usual.
+You can log just like usual. Want a quick look? Press and hold a blurred number to peek.
 
 ■ 14 faces that change with your weight
 Buddy's face changes compared to the average of the previous 7 days.
@@ -274,6 +277,7 @@ Choose a day card or a week card, in 4 colors.
 ■ Use it with peace of mind
 • No account needed. Start right after you install
 • Your logs stay on your device and are never sent to the developer's servers
+• Lock the app with Face ID. While it's on, widgets and Siri don't show your weight either
 • Back up to iCloud and pick up where you left off on a new phone (optional)
 • Export to CSV
 • Available in Japanese and English
@@ -281,7 +285,7 @@ Choose a day card or a week card, in 4 colors.
 Note: This app is for logging and looking back on your weight. It does not provide medical diagnosis or advice. Please treat the BMI and Buddy's comments as a rough guide.
 ```
 
-2989文字。
+3140文字。
 
 ---
 
@@ -289,13 +293,14 @@ Note: This app is for logging and looking back on your weight. It does not provi
 
 カンマ区切り・スペースなし。名前・サブタイトルの語は入れていません（`体重` `管理` `ダイエット` `記録` `キャラ` `見守る` は名前・サブタイトルで獲得ずみ）。
 
-### 日本語（95文字）
+### 日本語（99文字）
 
 ```
-BMI,体脂肪率,目標,減量,痩せる,習慣化,無料,ウィジェット,通知,メモ,癒し,健康,体重計,ログイン不要,振り返り,推移,平均,相棒,ハムスター,カレンダー,シェア,飲み会,リバウンド
+BMI,体脂肪率,目標,減量,痩せる,習慣化,無料,ウィジェット,通知,メモ,癒し,健康,体重計,ログイン不要,振り返り,推移,平均,相棒,ハムスター,カレンダー,シェア,飲み会,リバウンド,ロック
 ```
 
-- 新しく入れた語：`ハムスター`（新キャラ）、`カレンダー`、`シェア`、`飲み会`・`リバウンド`（もどるまで見守りで探す人向け）。
+- 新しく入れた語：`ハムスター`（新キャラ）、`カレンダー`、`シェア`、`飲み会`・`リバウンド`（もどるまで見守りで探す人向け）、`ロック`（Face ID でロック。人に見られたくない人向け）。
+- `Face ID` は Apple の商標なので、キーワードには入れません（概要で機能を説明するのはかまいません）。
 - 外した語：`管理`（名前に入った）、`キャラクター`（名前の「キャラ」と重なる）、`シンプル`・`朝`・`リマインド`・`体型`（枠を空けるため。体型は体型の話題に触れない方針とも合わない）。
 
 ### English (U.S.)（99文字）
@@ -306,6 +311,7 @@ diet,loss,lose,bmi,body,fat,goal,scale,graph,calendar,widget,habit,mood,streak,h
 
 - 英語の名前に `Weight` `Log` が入ったので、キーワードから `weight` `log` を外し、`diet` `hamster` `track` を入れました。
 - `kawaii` は、4.3 でリジェクトされた「かわいい〜」シリーズに見えないよう、外しました。
+- 枠が残っていないので、`lock` は入れていません。入れるなら `track` か `mood` と入れかえます。
 
 ### 使ってはいけない語（商標）
 
@@ -336,7 +342,8 @@ The app also supports Home Screen and Lock Screen widgets, and Siri and Shortcut
 No account or login is required. To see the features:
 - "Bounce-back watch": use "+ Log a past day" to log two past days, with the second one higher and tagged "Night out". The cloud card appears on the Home tab. Log a lower weight today to see it clear.
 - "Treat days": after logging today, tap "Declare" on the treat day card on the Home tab.
-- "Hide my weight": Settings tab, under "Hidden".
+- "Hide my weight": Settings tab, under "Hidden". Press and hold a blurred number to peek.
+- "Lock with Face ID" (off by default): Settings tab, under "Lock".
 ```
 
 - 機能の場所（ボタン名やタブ名）は、実際のアプリの表記に合わせて直してください。
@@ -372,6 +379,7 @@ Google の案内（AdMob の「Apple の App Store のデータ開示」ペー�
 - 開発者のサーバーはありません。開発者が自分で集める情報はありません。
 - シェアカードは端末の中で画像を作り、iPhone の共有メニューに渡すだけです。開発者には送られません。
 - アカウント登録はありません。
+- Face ID でロックするときの顔の情報は iOS が扱い、アプリにも開発者にも届きません（アプリが受け取るのは「本人かどうか」の結果だけ）。申告する項目は増えません。
 - iCloud バックアップは**任意**で、同期先は Apple の iCloud キーバリューストア。開発者は内容を参照できません。
 
 ### スクリーンショット（日本語・8枚、`AppStore/appstore_ja_v2`）
@@ -380,7 +388,7 @@ Google の案内（AdMob の「Apple の App Store のデータ開示」ペー�
 | ---- | -------------------------------------- | ------------------------------------------------------------------ |
 | 01   | ふえても大丈夫　もどるまで見守るよ     | ホーム（もやもや雲の見守りカード）。ラベルはアプリ名「たいかん！」 |
 | 02   | 食べる日は　先に伝えておけばOK         | ごほうびの日の翌朝                                                 |
-| 03   | 数字を見たくない日は　ことばで伝えるよ | 見ないモード                                                       |
+| 03   | 数字を見たくない日も　ぼかしてきろく   | 見ないモードのホーム（7日平均・もくひょう・あと・入力欄がぼかし）  |
 | 04   | 体重にあわせて　キャラがリアクション   | 表情ずかん                                                         |
 | 05   | 数字なしで　シェアできる               | シェアカード                                                       |
 | 06   | 毎日の表情が　カレンダーにならぶ       | カレンダー                                                         |
@@ -388,8 +396,10 @@ Google の案内（AdMob の「Apple の App Store のデータ開示」ペー�
 | 08   | ロック画面から　1タップで入力へ（差し替え待ち。今の画像は「1タップできろく」） | ロック画面ウィジェット                         |
 
 - サイズは 1320×2868（6.9インチ）と 1206×2622（6.3インチ）。
-- **01・03・05・08 は、今のアプリと違うところがあるので、提出前に差し替えます。** 05 の LINE・X・Instagram のボタンはアプリにありません。08 の「1タップできろく」は、ボタンがロックしたまま記録できるように読めます（実際は入力画面を開くボタンで、ロック解除が必要）。
-- 英語版（`AppStore/appstore_en_v2`、同じ8枚・同じ2サイズ。画像は未確認）：01 Gained a bit? Buddy waits with you／02 Planning a feast? Tell Buddy first／03 Rather not look? Buddy tells you／04 A buddy that reacts to your weight／05 Share without the numbers／06 Every day’s face on your calendar／07 Put Buddy on your Home Screen／08 Log in one tap from the Lock Screen（日本語と同じ理由で差し替え待ち）。画面の文言は Localizable.strings の英訳に合わせた。
+- **01・05・08 は、今のアプリと違うところがあるので、提出前に差し替えます。** 03 は2026年11月16日に今のアプリの画面で作り直しずみ。 05 の LINE・X・Instagram のボタンはアプリにありません。08 の「1タップできろく」は、ボタンがロックしたまま記録できるように読めます（実際は入力画面を開くボタンで、ロック解除が必要）。
+- 英語版（`AppStore/appstore_en_v2`、同じ8枚・同じ2サイズ。画像は未確認）：01 Gained a bit? Buddy waits with you／02 Planning a feast? Tell Buddy first／03 Rather not look? Log it blurred／04 A buddy that reacts to your weight／05 Share without the numbers／06 Every day’s face on your calendar／07 Put Buddy on your Home Screen／08 Log in one tap from the Lock Screen（01・05・08 は日本語と同じ理由で差し替え待ち）。画面の文言は Localizable.strings の英訳に合わせた。
+- 差し替え用の素材（アプリの画面そのまま・1320×2868・日英）：`AppStore/screens_hidden/`（見ないモードのホームとグラフ）、`AppStore/screens_lock/`（Face ID のロック画面と、せっていのロックのスイッチ）。デバッグビルドの起動引数 `--preview-shot` で撮り直せる（`Debug/PreviewTour.swift`）。
+- Face ID でロックは、いまのスクリーンショットには入っていません。入れるなら、04〜07 のどれかと入れかえるか、9枚目に足します（上限は10枚）。
 
 ### プレビュー動画・ヘッダ画像
 
@@ -407,7 +417,8 @@ Google の案内（AdMob の「Apple の App Store のデータ開示」ペー�
 | たいかん！（名前）・Taikan!（英語名）               | 名前、キーワードの注記、審査メモ、`InfoPlist.strings`、紹介ページ、スクリーンショット01、シェアカードの下の文字 |
 | もどるまで見守り（7日平均にもどる・何日で）         | サブタイトル、プロモ、概要、審査メモ、スクショ01                                                                |
 | ごほうびの日                                        | プロモ、概要、審査メモ、スクショ02、プロモのストック（年末年始）                                                |
-| 見ないモード                                        | プロモ、概要、審査メモ、スクショ03                                                                              |
+| 見ないモード（長押しで見られる）                    | プロモ、概要、審査メモ、スクショ03                                                                              |
+| Face ID でロック（ウィジェット・Siri も数字をかくす） | 概要、キーワード、審査メモの控え、App のプライバシーの注記                                                    |
 | 14の表情                                            | 概要、スクショ04、紹介ページ                                                                                    |
 | タグ5つ（飲み会・外食・寝不足・のんびり・運動した） | 概要                                                                                                            |
 | 1週・1か月・3か月                                   | 概要                                                                                                            |
@@ -417,3 +428,32 @@ Google の案内（AdMob の「Apple の App Store のデータ開示」ペー�
 | 体重よそう（初期オフ）                              | 概要                                                                                                            |
 | アカウント登録なし・端末の中に保存                  | 概要、プロモ、審査メモ、App のプライバシー                                                                      |
 | 課金なし・広告あり                                  | 早見表の価格、カテゴリの注記、App のプライバシー、紹介ページ                                                    |
+
+---
+
+## 10. このバージョンの最新情報（What's New・v1.1）
+
+App Store Connect の「このバージョンの最新情報」に貼る本文です（4000文字まで）。
+v1.1 で足した機能（Face ID でロック・見ないモードの長押し）だけを書いています。
+
+### 日本語
+
+```
+・Face ID でロックできるようになりました
+せってい › ロック でオンにすると、アプリを開くたびに Face ID で本人か確かめます（うまくいかないときはパスコードで開けます）。
+オンのあいだは、ウィジェットと Siri でも体重の数字を出しません。
+
+・見ないモードで、長押しで数字を見られるようになりました
+ぼかした数字を長押ししているあいだだけ、体重が見られます。指をはなすと、またかくれます。
+```
+
+### English (U.S.)
+
+```
+• Lock with Face ID
+Turn it on in Settings › Lock, and Taikan! asks for Face ID each time you open it (you can use your passcode if Face ID doesn't work).
+While it's on, widgets and Siri don't show your weight either.
+
+• Peek in Hide my weight
+Press and hold a blurred number to see your weight. Let go, and it's hidden again.
+```

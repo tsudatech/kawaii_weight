@@ -24,8 +24,14 @@ struct kawaii_taiju_kanriApp: App {
         }
         .onChange(of: scenePhase) { _, phase in
             switch phase {
-            case .active: store.didBecomeActive()
-            case .background: store.saveNow()
+            case .active:
+                store.didBecomeActive()
+                Task { await AppLock.shared.promptIfNeeded() }
+            case .background:
+                store.saveNow()
+                store.setPeekingNumbers(false)
+                // 非アクティブ（確かめるダイアログが出ただけ）ではロックしない。背景に回ったときだけ
+                AppLock.shared.lock()
             default: break
             }
         }

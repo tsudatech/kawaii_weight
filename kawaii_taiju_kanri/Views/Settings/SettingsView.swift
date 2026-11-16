@@ -20,6 +20,7 @@ struct SettingsView: View {
             notifyGroup.padding(.top, 18)
             playGroup.padding(.top, 18)
             hideGroup.padding(.top, 18)
+            lockGroup.padding(.top, 18)
             iPhoneGroup.padding(.top, 18)
             charaGroup.padding(.top, 18)
             dataGroup.padding(.top, 18)
@@ -143,13 +144,31 @@ struct SettingsView: View {
     private var hideGroup: some View {
         SettingsGroup(
             title: L("見ないモード"),
-            footer: L("数字を見たくない日に。体重はぼかして、キャラの表情とことばだけで伝えるよ。記録はいつもどおりできるよ")
+            footer: L("数字を見たくない日に。体重はぼかして、キャラの表情とことばだけで伝えるよ。記録はいつもどおりできるよ。ぼかした数字を長押ししているあいだだけ見られるよ")
         ) {
             SettingsToggleRow(
                 icon: "👀", iconBG: Color(hex: 0xF3EEE9), label: L("体重の数字をかくす"),
                 isOn: Binding(get: { store.settings.hideNumbers }, set: { on in
                     store.settings.hideNumbers = on
                     store.showToast(on ? L("体重の数字をかくしました") : L("数字を表示します"))
+                })
+            )
+        }
+    }
+
+    // MARK: - ロック
+
+    private var lockGroup: some View {
+        let method = AppLock.shared.method?.label ?? L("パスコード")
+        return SettingsGroup(
+            title: L("ロック"),
+            footer: L("オンのあいだは、ウィジェットとSiriでも体重の数字を出さないよ")
+        ) {
+            SettingsToggleRow(
+                icon: "🔐", iconBG: Color(hex: 0xF3EEE9), label: LF("%@でロック", method),
+                note: L("開くたびに本人か確かめるよ"),
+                isOn: Binding(get: { store.settings.appLock }, set: { on in
+                    Task { await AppLock.shared.setEnabled(on) }
                 })
             )
         }

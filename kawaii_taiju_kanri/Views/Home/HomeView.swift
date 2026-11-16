@@ -164,7 +164,7 @@ struct HomeHeroCard: View {
         let prev = store.sortedDates.last { $0 < .today }
         let label = store.settings.judge == .trend ? L("7日平均から")
             : prev.map { $0.days(to: .today) == 1 } ?? true ? L("まえの日から") : L("まえの記録から")
-        let hide = store.settings.hideNumbers
+        let hide = store.hidesNumbers
         return VStack(alignment: .leading, spacing: 0) {
             if hide {
                 Text(L("きろくしたよ")).font(.ui(24, .black)).foregroundStyle(Palette.ink)
@@ -474,7 +474,7 @@ struct GoalCard: View {
         let band = g.pct <= 0 ? 0 : (bands.indices.first { $0 > 0 && g.pct < bands[$0].upTo } ?? bands.count - 1)
         let c = bands[band]
         let toHalf = max(0, g.latest - (g.start - g.span / 2))
-        let hide = store.settings.hideNumbers
+        let hide = store.hidesNumbers
         let message = c.lines[cheerIndex % c.lines.count]
             .replacingOccurrences(of: "{p}", with: "\(Int(floor(g.pct)))")
             .replacingOccurrences(of: "{left}kg", with: hide ? L("もう少し") : "\(Fmt.kg(g.left))kg")
@@ -558,6 +558,7 @@ struct HistoryCard: View {
                 ForEach(Array(recent.enumerated()), id: \.element) { idx, d in
                     Button { store.openDay(d, from: L("りれき")) } label: { HistoryRow(date: d) }
                         .buttonStyle(.plain)
+                        .peekNumbers()
                         .overlay(alignment: .top) {
                             if idx > 0 {
                                 Line().stroke(Palette.line, style: StrokeStyle(lineWidth: 1.5, dash: [4.5, 3]))
@@ -598,7 +599,7 @@ struct HistoryRow: View {
                 Text(diff.map { Fmt.signed($0) } ?? " ").font(.num(12, .bold)).foregroundStyle(deltaColor(diff))
                     .numLineHeight(1.1, size: 12)
             }
-            .hiddenNumber()
+            .hiddenNumber(peek: false)  // 長押しは行のボタンのほう
         }
         .padding(.vertical, 8)
         .contentShape(Rectangle())
@@ -616,7 +617,7 @@ struct HistoryRow: View {
             if let memo = entry?.memo {
                 Text("📝\(memo)")
             } else if tags.isEmpty {
-                Text(mood.label + (store.settings.hideNumbers ? "" : entry?.fat.map { " ・ \(Fmt.kg($0))%" } ?? ""))
+                Text(mood.label + (store.hidesNumbers ? "" : entry?.fat.map { " ・ \(Fmt.kg($0))%" } ?? ""))
             }
         }
         .font(.ui(11))

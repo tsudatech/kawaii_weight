@@ -38,20 +38,74 @@ extension View {
     }
 }
 
-/// 見ないモードのとき、体重の数字をぼかす（.phone.hideNum）
+/// 見ないモードのとき、体重の数字をぼかす（.phone.hideNum）。長押ししているあいだは、画面の数字をぜんぶ見せる
 private struct HiddenNumber: ViewModifier {
+    @EnvironmentObject private var store: WeightStore
+    /// ボタンの中の数字は false にして、ボタンのほうに .peekNumbers() をつける
+    /// （中の部品に長押しをつけると、ボタンのタップが効かなくなるため）
+    let peek: Bool
+
+    func body(content: Content) -> some View {
+        let hide = store.hidesNumbers
+        let blurred = content
+            .blur(radius: hide ? 7 : 0)
+            .accessibilityHidden(hide)
+        if peek { blurred.peekNumbers() } else { blurred }
+    }
+}
+
+/// 見ないモードのとき、長押ししているあいだだけ数字を見せる（ぼかした数字と「見ないモード」のバッジにつける）
+private struct PeekNumbers: ViewModifier {
     @EnvironmentObject private var store: WeightStore
 
     func body(content: Content) -> some View {
-        let hide = store.settings.hideNumbers
-        content
-            .blur(radius: hide ? 7 : 0)
-            .accessibilityHidden(hide)
+        // UIKit の長押しを使う。SwiftUI の LongPressGesture＋DragGesture だと、
+        // スクロールする画面（ホームのりれきなど）の上で指を動かしてもスクロールしなくなるため。
+        // 0.3 秒たつ前に指が動けば長押しにならず、スクロールのほうに回る
+        content.gesture(PeekPress(enabled: store.settings.hideNumbers) { store.setPeekingNumbers($0) })
+    }
+}
+
+/// 長押しが決まってから指をはなすまで on になる
+private struct PeekPress: UIGestureRecognizerRepresentable {
+    let enabled: Bool
+    let onChange: (Bool) -> Void
+
+    func makeUIGestureRecognizer(context: Context) -> UILongPressGestureRecognizer {
+        let g = UILongPressGestureRecognizer()
+        g.minimumPressDuration = 0.3
+        g.allowableMovement = 10
+        // 長押しが決まったら、外側のボタン（りれきの行など）へのタッチは取り消す（指をはなしても日を開かない）。
+        // それでも押されたことになるぶんは WeightStore.justPeeked で受け流す
+        g.cancelsTouchesInView = true
+        g.isEnabled = enabled
+        // ボタンの中でも動くよう、ほかの指の動き（ボタンのタップ・スクロール）と同時に見てもらう
+        g.delegate = context.coordinator
+        return g
+    }
+
+    func makeCoordinator(converter: CoordinateSpaceConverter) -> Coordinator { Coordinator() }
+
+    final class Coordinator: NSObject, UIGestureRecognizerDelegate {
+        func gestureRecognizer(_ g: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool { true }
+    }
+
+    func updateUIGestureRecognizer(_ recognizer: UILongPressGestureRecognizer, context: Context) {
+        recognizer.isEnabled = enabled
+    }
+
+    func handleUIGestureRecognizerAction(_ recognizer: UILongPressGestureRecognizer, context: Context) {
+        switch recognizer.state {
+        case .began: onChange(true)
+        case .ended, .cancelled, .failed: onChange(false)
+        default: break
+        }
     }
 }
 
 extension View {
-    func hiddenNumber() -> some View { modifier(HiddenNumber()) }
+    func hiddenNumber(peek: Bool = true) -> some View { modifier(HiddenNumber(peek: peek)) }
+    func peekNumbers() -> some View { modifier(PeekNumbers()) }
 }
 
 /// .card h2（15px・900、右に小さな説明やボタン）
@@ -120,6 +174,7 @@ struct ScreenHeader<Trailing: View>: View {
                             .foregroundStyle(Palette.onInk)
                             .padding(.vertical, 2).padding(.horizontal, 8)
                             .background(Capsule().fill(Palette.ink))
+                            .peekNumbers()
                     }
                 }
             }
@@ -447,7 +502,7 @@ struct WeightStepper: View {
     @FocusState private var focused: Bool
 
     var body: some View {
-        let masked = store.settings.hideNumbers
+        let masked = store.hidesNumbers
         HStack(spacing: 8) {
             RoundStepButton(symbol: "−") { bump(-step) }
                 .accessibilityLabel(LF("%1$@%2$@ 減らす", Fmt.kg(step), unit))

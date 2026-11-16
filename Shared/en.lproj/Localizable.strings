@@ -563,7 +563,7 @@
 "はかる前に「ふえた・おなじ・へった」を当てるゲーム" = "Guess “up, same, or down” before weighing in";
 "体重よそうをオンにしました。ホームに出るよ" = "Weight Guess is on. See it on Home";
 "体重よそうをオフにしました" = "Weight Guess is off";
-"数字を見たくない日に。体重はぼかして、キャラの表情とことばだけで伝えるよ。記録はいつもどおりできるよ" = "For days you’d rather not see numbers. Your weight is blurred, and Buddy lets you know with faces and words. Logging works as usual";
+"数字を見たくない日に。体重はぼかして、キャラの表情とことばだけで伝えるよ。記録はいつもどおりできるよ。ぼかした数字を長押ししているあいだだけ見られるよ" = "For days you’d rather not see numbers. Your weight is blurred, and Buddy lets you know with faces and words. Logging works as usual. Press and hold a blurred number to peek";
 "体重の数字をかくす" = "Hide my weight";
 "体重の数字をかくしました" = "Your weight is hidden";
 "数字を表示します" = "Showing numbers";
@@ -574,3 +574,17 @@
 "ロック画面で見られて、1タップで体重入力へ" = "Check at a glance and jump to weight entry in one tap";
 "Siri・ショートカット" = "Siri & Shortcuts";
 "「Hey Siri、%@で体重をきろく」" = "“Hey Siri, log my weight in %@”";
+
+// アプリのロック（Store/AppLock.swift）
+"ロック" = "Lock";
+"%@でロック" = "Lock with %@";
+"開くたびに本人か確かめるよ" = "Confirms it’s you each time you open the app";
+"オンのあいだは、ウィジェットとSiriでも体重の数字を出さないよ" = "While this is on, widgets and Siri don’t show your weight either";
+"パスコード" = "Passcode";
+"パスコードが設定されていないので使えないよ" = "Not available because this iPhone has no passcode";
+"%@でロックするよ" = "The app will now lock with %@";
+"ロックをオフにしました" = "Lock turned off";
+"記録を見るために、本人か確かめます" = "Confirm it’s you to see your logs";
+"ロックしています" = "Taikan! is locked";
+"記録を見るには、本人か確かめてね" = "Confirm it’s you to see your logs";
+"%@で開く" = "Unlock with %@";

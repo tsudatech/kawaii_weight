@@ -154,6 +154,11 @@ struct AppSettings: Equatable, Codable {
     var health = false
     /// 体重よそう（せっていでオンにした人だけ）
     var game = false
+    /// Face ID などでアプリを開く（AppLock）。端末ごとの設定
+    var appLock = false
+
+    /// ウィジェット・Siri で体重の数字を出さないか。ロック中は、アプリの外にも数字を出さない
+    var hidesNumbersOutside: Bool { hideNumbers || appLock }
 }
 
 // あとから項目が増えても、古い保存データを読めるようにする
@@ -173,6 +178,7 @@ extension AppSettings {
         hideNumbers = try c.decodeIfPresent(Bool.self, forKey: .hideNumbers) ?? d.hideNumbers
         health = try c.decodeIfPresent(Bool.self, forKey: .health) ?? d.health
         game = try c.decodeIfPresent(Bool.self, forKey: .game) ?? d.game
+        appLock = try c.decodeIfPresent(Bool.self, forKey: .appLock) ?? d.appLock
     }
 }
 

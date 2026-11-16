@@ -105,7 +105,7 @@ struct DayDetailView: View {
             .foregroundStyle(Palette.ink)
             .hiddenNumber()
             .padding(.top, 4)
-            Text([face.mood.label, store.settings.hideNumbers ? nil : entry.fat.map { LF("体脂肪 %@%%", Fmt.kg($0)) }].compactMap { $0 }.joined(separator: L(" ・ ")))
+            Text([face.mood.label, store.hidesNumbers ? nil : entry.fat.map { LF("体脂肪 %@%%", Fmt.kg($0)) }].compactMap { $0 }.joined(separator: L(" ・ ")))
                 .font(.ui(12))
                 .foregroundStyle(Palette.inkSoft)
                 .padding(.top, 4)
@@ -225,7 +225,7 @@ struct DayDetailView: View {
 
     private func neighbor(_ d: Date?, forward: Bool) -> some View {
         Button {
-            guard let d else { return }
+            guard let d, !store.justPeeked else { return }
             store.detailDate = d
             bounce += 1
             withAnimation(.easeInOut(duration: 0.35)) { position.scrollTo(edge: .top) }
@@ -235,7 +235,7 @@ struct DayDetailView: View {
                     let face = Image(store.mood(for: d).smallAsset).resizable().scaledToFit().frame(width: 34, height: 34)
                     let txt = VStack(alignment: forward ? .trailing : .leading, spacing: 0) {
                         Text(Fmt.slash(d))
-                        Text(Fmt.kg(e.weight)).font(.num(15, .bold)).hiddenNumber()
+                        Text(Fmt.kg(e.weight)).font(.num(15, .bold)).hiddenNumber(peek: false)  // 長押しはボタンのほう
                     }
                     if forward {
                         Spacer(minLength: 0)
@@ -263,6 +263,7 @@ struct DayDetailView: View {
             .opacity(d == nil ? 0.35 : 1)
         }
         .buttonStyle(.plain)
+        .peekNumbers()
         .disabled(d == nil)
     }
 }
